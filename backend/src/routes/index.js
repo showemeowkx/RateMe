@@ -1,6 +1,6 @@
 const express = require("express");
 
-const mainRouter = require("./mainPage");
+const mainRouter = require("./main-page-rt");
 
 const router = express.Router();
 

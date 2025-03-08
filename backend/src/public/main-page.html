@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>rateMe!</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 50px;
+      }
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>This is the main page!</h1>
+    <button onclick="redirect('add-review')">Create a review</button>
+    <button onclick="redirect('account')">Account settings</button>
+  </body>
+
+  <script>
+    const redirect = (path) => {
+      window.location.href = path;
+    };
+  </script>
+</html>
