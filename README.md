@@ -1,9 +1,10 @@
-#📌 RateMe - review tracker
+# 📌 RateMe - review tracker
 
-##🚀 Overview
+## 🚀 Overview
+
 RateMe is a web application that allows users to track and leave reviews for different products. Users can browse products, submit reviews, and analyze review trends using data analytics.
 
-##✅ Features
+## ✅ Features
 
 - Product listing and search
 
@@ -15,7 +16,7 @@ RateMe is a web application that allows users to track and leave reviews for dif
 
 - Responsive UI with React
 
-##🚀 Getting Started
+## 🚀 Getting Started
 
 1️⃣ Prerequisites
 
@@ -50,7 +51,8 @@ npm install
 npm start
 ```
 
-##🤝 Contribution Guide
+## 🤝 Contribution Guide
+
 If you’re open to contributions, explain how people can contribute.
 
 1. Fork the repository
@@ -58,4 +60,4 @@ If you’re open to contributions, explain how people can contribute.
 3. Commit and push
 4. Open a pull request
 
-#Rate! Rate! Rate!
+# Rate! Rate! Rate!
