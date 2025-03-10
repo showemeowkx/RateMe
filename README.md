@@ -53,8 +53,6 @@ npm start
 
 ## 🤝 Contribution Guide
 
-If you’re open to contributions, explain how people can contribute.
-
 1. Fork the repository
 2. Create a new branch (feature-xyz)
 3. Commit and push
