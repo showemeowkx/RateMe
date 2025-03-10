@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Add review - rateMe!</title>
+  </head>
+  <body>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        margin-top: 50px;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        align-items: start;
+        margin-left: 600px;
+      }
+      button {
+        padding: 7px 20px;
+        font-size: 16px;
+        font-style: oblique;
+        cursor: pointer;
+        margin: 5px;
+      }
+      input[type="text"] input[type="number"] {
+        font-size: 16px;
+        padding: 10px;
+        margin: 5px;
+        border: 1px solid lightgray;
+        border-radius: 5px;
+        width: 100%;
+        max-width: 500px;
+      }
+      textarea {
+        resize: none;
+      }
+    </style>
+    <h1>Add a review!</h1>
+    <form action="/add-review" method="post">
+      <label for="productName">Product name:</label>
+      <input
+        type="text"
+        name="productName"
+        id="productName"
+        placeholder="IPhone 16 Pro Max, Apple Macbook M1, etc..."
+      />
+      <label for="rating">Give a rating out of 10:</label>
+      <input type="number" name="rating" id="rating" max="10" min="1" />
+      <label for="reviewText">Write a review:</label>
+      <textarea
+        name="reviewText"
+        id="reviewText"
+        placeholder="Enter your review here..."
+        cols="30"
+        rows="10"
+        maxlength="500"
+      ></textarea>
+      <button type="submit">Add a review</button>
+    </form>
+  </body>
+</html>
