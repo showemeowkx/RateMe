@@ -1,0 +1,29 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nest-backend
+    ports:
+      - '${PORT}:${PORT}'
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - DATABASE_URL=postgres://${DB_USERNAME}:${DB_PASSWORD}@db:5432/rate-me-postgres
+    depends_on:
+      - database
+    restart: unless-stopped
+
+  database:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=rate-me-postgres
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - '5432:5432'
+
+volumes:
+  pgdata:
