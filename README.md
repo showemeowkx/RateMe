@@ -24,6 +24,8 @@ Ensure you have the following installed:
 
 - Node.js and npm
 
+- Docker, Docker Compose
+
 - Python 3
 
 2️⃣ Installation
@@ -35,20 +37,24 @@ git clone https://github.com/showemeowkx/RateMe.git
 cd rate-me
 ```
 
-Set up the backend
+Create an environment file
 
 ```bash
-cd backend
-npm install
-npm run start
+cp .env
 ```
 
-Set up the frontend
+Edit ```.env``` and update any required values (e.g., DB credentials, ports).
+
+Build the Docker images
 
 ```bash
-cd frontend
-npm install
-npm start
+docker-compose build
+```
+
+Run the app
+
+```bash
+docker-compose up
 ```
 
 ## 🤝 Contribution Guide
