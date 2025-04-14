@@ -3,12 +3,14 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { AuthSignUpCredDto } from './dto/auth-sign-up.dto';
+import { AuthSignInCredDto } from './dto/auth-sign-in.dto';
 
 @Injectable()
 export class AuthService {
@@ -47,6 +49,21 @@ export class AuthService {
         );
         throw new InternalServerErrorException();
       }
+    }
+  }
+
+  async signIn(authSignInCredDto: AuthSignInCredDto): Promise<User> {
+    const { login, password } = authSignInCredDto;
+    const user = await this.userRepository.findOneBy([
+      { username: login },
+      { email: login },
+    ]);
+
+    if (user && (await bcrypt.compare(password, user.password))) {
+      return user;
+    } else {
+      this.logger.error(`[WRONG INPUT] Failed to sign in {login: ${login}}`);
+      throw new UnauthorizedException('Wrong login or password!');
     }
   }
 }
