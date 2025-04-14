@@ -27,6 +27,7 @@
     "@nestjs/typeorm": "^11.0.0",
     "@sideway/address": "^5.0.0",
     "@sideway/formula": "^3.0.1",
+    "bcryptjs": "^3.0.2",
     "class-validator": "^0.14.1",
     "joi": "^17.13.3",
     "pg": "^8.14.1",
