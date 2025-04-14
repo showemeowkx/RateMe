@@ -11,11 +11,17 @@ import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { AuthSignUpCredDto } from './dto/auth-sign-up.dto';
 import { AuthSignInCredDto } from './dto/auth-sign-in.dto';
+import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './jwt-payload.interface';
 
 @Injectable()
 export class AuthService {
   private logger = new Logger('AuthService', { timestamp: true });
-  @InjectRepository(User) private userRepository: Repository<User>;
+  constructor(
+    @InjectRepository(User)
+    private userRepository: Repository<User>,
+    private jwtService: JwtService,
+  ) {}
 
   async createUser(authSignInCredDto: AuthSignUpCredDto): Promise<void> {
     const { name, surname, username, email, password } = authSignInCredDto;
@@ -52,7 +58,7 @@ export class AuthService {
     }
   }
 
-  async signIn(authSignInCredDto: AuthSignInCredDto): Promise<User> {
+  async signIn(authSignInCredDto: AuthSignInCredDto): Promise<{ accessToken }> {
     const { login, password } = authSignInCredDto;
     const user = await this.userRepository.findOneBy([
       { username: login },
@@ -60,7 +66,9 @@ export class AuthService {
     ]);
 
     if (user && (await bcrypt.compare(password, user.password))) {
-      return user;
+      const payload: JwtPayload = { login, isModerator: user.isModerator };
+      const accessToken: string = await this.jwtService.signAsync(payload);
+      return { accessToken };
     } else {
       this.logger.error(`[WRONG INPUT] Failed to sign in {login: ${login}}`);
       throw new UnauthorizedException('Wrong login or password!');
