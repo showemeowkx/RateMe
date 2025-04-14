@@ -21,5 +21,5 @@ export class User {
   password: string;
 
   @Column()
-  isAdmin: boolean;
+  isModerator: boolean;
 }
