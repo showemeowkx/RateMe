@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: nest-backend
     ports:
-      - '${PORT}:${PORT}'
+      - "${PORT}:${PORT}"
     environment:
       - NODE_ENV=${NODE_ENV}
       - DATABASE_URL=postgres://${DB_USERNAME}:${DB_PASSWORD}@db:5432/rate-me-postgres
@@ -23,7 +23,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      - '5432:5432'
+      - "${DB_PORT}:5432"
 
 volumes:
   pgdata:
