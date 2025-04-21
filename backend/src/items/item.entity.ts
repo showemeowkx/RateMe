@@ -12,7 +12,7 @@ export class Item {
   @Column()
   category: Categories;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @Column()
@@ -24,6 +24,7 @@ export class Item {
   @Column()
   link: string;
 
+  //temporarily change
   @Column()
-  reviews: string[];
+  reviews: string;
 }

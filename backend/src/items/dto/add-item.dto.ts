@@ -1,7 +1,6 @@
 import {
   IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsString,
   MaxLength,
   MinLength,
@@ -24,9 +23,4 @@ export class AddItemDto {
   @IsNotEmpty()
   @MaxLength(1000)
   description: string;
-
-  //will be reworked later
-  @IsNumber()
-  @IsNotEmpty()
-  rating: number;
 }
