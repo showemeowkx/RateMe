@@ -8,6 +8,9 @@ export class Review {
   id: string;
 
   @Column()
+  origin: string;
+
+  @Column()
   itemId: string;
 
   @Column()
