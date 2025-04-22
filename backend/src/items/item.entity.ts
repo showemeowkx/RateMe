@@ -1,10 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Categories } from './categories.enum';
+import { User } from 'src/auth/user.entity';
 
 @Entity()
 export class Item {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @ManyToOne(() => User, (user) => user.items, { eager: true })
+  creator: User;
 
   @Column()
   image: string;

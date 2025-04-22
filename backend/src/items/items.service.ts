@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Item } from './item.entity';
 import { AddItemDto } from './dto/add-item.dto';
+import { User } from 'src/auth/user.entity';
 
 @Injectable()
 export class ItemsService {
@@ -16,15 +17,16 @@ export class ItemsService {
     @InjectRepository(Item) private itemsRepository: Repository<Item>,
   ) {}
 
-  async addItem(addItemDto: AddItemDto): Promise<void> {
+  async addItem(addItemDto: AddItemDto, user: User): Promise<void> {
     const { image, category, name, description } = addItemDto;
 
     const item = this.itemsRepository.create({
+      creator: user,
       image,
       category,
       name,
       description,
-      rating: 0,
+      rating: 4,
       link: 'NO_LINK_PROVIDED',
       reviews: '',
     });

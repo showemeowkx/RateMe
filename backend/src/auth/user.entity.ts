@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Item } from 'src/items/item.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class User {
@@ -19,6 +20,9 @@ export class User {
 
   @Column()
   password: string;
+
+  @OneToMany(() => Item, (item) => item.creator, { eager: false })
+  items: Item[];
 
   @Column()
   isModerator: boolean;
