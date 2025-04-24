@@ -8,10 +8,6 @@ import {
 import { Categories } from '../categories.enum';
 
 export class AddItemDto {
-  //placeholder
-  @IsNotEmpty()
-  image: string;
-
   @IsEnum(Categories)
   category: Categories;
 

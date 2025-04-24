@@ -11,7 +11,7 @@ export class Item {
   creator: User;
 
   @Column()
-  image: string;
+  imagePath: string;
 
   @Column()
   category: Categories;
@@ -22,7 +22,7 @@ export class Item {
   @Column()
   description: string;
 
-  @Column()
+  @Column('double precision')
   rating: number;
 
   @Column()

@@ -17,16 +17,20 @@ export class ItemsService {
     @InjectRepository(Item) private itemsRepository: Repository<Item>,
   ) {}
 
-  async addItem(addItemDto: AddItemDto, user: User): Promise<void> {
-    const { image, category, name, description } = addItemDto;
+  async addItem(
+    addItemDto: AddItemDto,
+    user: User,
+    file: Express.Multer.File,
+  ): Promise<void> {
+    const { category, name, description } = addItemDto;
 
     const item = this.itemsRepository.create({
       creator: user,
-      image,
+      imagePath: file.path,
       category,
       name,
       description,
-      rating: 4,
+      rating: 0,
       link: 'NO_LINK_PROVIDED',
       reviews: '',
     });
