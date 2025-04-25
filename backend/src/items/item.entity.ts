@@ -13,7 +13,7 @@ export class Item {
   @Column()
   imagePath: string;
 
-  @Column()
+  @Column({ type: 'enum', enum: Categories })
   category: Categories;
 
   @Column({ unique: true })
