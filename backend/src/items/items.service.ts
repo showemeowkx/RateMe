@@ -9,6 +9,7 @@ import { Repository } from 'typeorm';
 import { Item } from './item.entity';
 import { AddItemDto } from './dto/add-item.dto';
 import { User } from 'src/auth/user.entity';
+import * as fs from 'fs/promises';
 
 @Injectable()
 export class ItemsService {
@@ -38,6 +39,7 @@ export class ItemsService {
     try {
       await this.itemsRepository.save(item);
     } catch (error) {
+      if (file?.path) await fs.unlink(file.path);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (error.code === '23505') {
         this.logger.error(

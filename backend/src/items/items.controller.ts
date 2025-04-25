@@ -13,7 +13,7 @@ import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { storageOptions } from './storage-options';
+import { storageOptions } from './file-upload/storage-options';
 
 @Controller('items')
 @UseGuards(AuthGuard())
