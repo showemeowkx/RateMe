@@ -14,7 +14,6 @@ export class CreateReviewDto {
   @IsNumber()
   rating: number;
 
-  @IsNotEmpty()
   @IsEnum(UsePeriod)
   usePeriod: UsePeriod;
 
@@ -22,11 +21,13 @@ export class CreateReviewDto {
   @IsBoolean()
   isRecommended: boolean;
 
-  //will be reworked later
+  @IsNotEmpty()
+  @MaxLength(300)
   @IsString()
   liked: string;
 
-  //will be reworked later
+  @IsNotEmpty()
+  @MaxLength(300)
   @IsString()
   disliked: string;
 

@@ -1,6 +1,13 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Categories } from './categories.enum';
 import { User } from 'src/auth/user.entity';
+import { Review } from 'src/reviews/review.entity';
 
 @Entity()
 export class Item {
@@ -28,7 +35,6 @@ export class Item {
   @Column()
   link: string;
 
-  //temporarily change
-  @Column()
-  reviews: string;
+  @OneToMany(() => Review, (review) => review.item, { eager: true })
+  reviews: Review[];
 }

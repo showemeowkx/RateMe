@@ -33,7 +33,6 @@ export class ItemsService {
       description,
       rating: 0,
       link: 'NO_LINK_PROVIDED',
-      reviews: '',
     });
 
     try {

@@ -1,4 +1,5 @@
 import { Item } from 'src/items/item.entity';
+import { Review } from 'src/reviews/review.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
@@ -23,6 +24,9 @@ export class User {
 
   @OneToMany(() => Item, (item) => item.creator, { eager: false })
   items: Item[];
+
+  @OneToMany(() => Review, (review) => review.author, { eager: true })
+  reviews: Review[];
 
   @Column()
   isModerator: boolean;

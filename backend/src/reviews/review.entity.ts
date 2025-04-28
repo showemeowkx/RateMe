@@ -1,6 +1,7 @@
 import { User } from 'src/auth/user.entity';
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UsePeriod } from './use-period.enum';
+import { Item } from 'src/items/item.entity';
 
 @Entity()
 export class Review {
@@ -10,16 +11,16 @@ export class Review {
   @Column()
   origin: string;
 
-  @Column()
-  itemId: string;
+  @ManyToOne(() => Item, (item) => item.reviews, { eager: false })
+  item: string;
 
-  @Column()
+  @ManyToOne(() => User, (user) => user.reviews, { eager: false })
   author: User;
 
   @Column()
   rating: number;
 
-  @Column()
+  @Column({ type: 'enum', enum: UsePeriod })
   usePreiod: UsePeriod;
 
   @Column()
