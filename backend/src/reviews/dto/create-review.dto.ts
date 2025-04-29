@@ -2,7 +2,6 @@ import {
   IsBoolean,
   IsEnum,
   IsNotEmpty,
-  IsNumber,
   IsString,
   MaxLength,
   MinLength,
@@ -10,26 +9,20 @@ import {
 import { UsePeriod } from '../use-period.enum';
 
 export class CreateReviewDto {
-  @IsNotEmpty()
-  @IsNumber()
-  rating: number;
-
   @IsEnum(UsePeriod)
   usePeriod: UsePeriod;
 
   @IsNotEmpty()
   @IsBoolean()
-  isRecommended: boolean;
+  isRecommended?: boolean;
 
-  @IsNotEmpty()
   @MaxLength(300)
   @IsString()
-  liked: string;
+  liked?: string;
 
-  @IsNotEmpty()
   @MaxLength(300)
   @IsString()
-  disliked: string;
+  disliked?: string;
 
   @MinLength(20)
   @MaxLength(1000)

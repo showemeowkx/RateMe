@@ -1,7 +1,7 @@
 export enum UsePeriod {
-  someHours = 'Кілька годин',
-  someDays = 'Кілька днів',
-  someWeeks = 'Кілька тижнів',
-  someMonths = 'Кілька місяців',
-  someYears = 'Рік і більше',
+  SOME_HOURS = 'Кілька годин',
+  SOME_DAYS = 'Кілька днів',
+  SOME_WEEKS = 'Кілька тижнів',
+  SOME_MONTHS = 'Кілька місяців',
+  SOME_YEARS = 'Рік і більше',
 }
