@@ -9,6 +9,8 @@ services:
     environment:
       - NODE_ENV=${NODE_ENV}
       - DATABASE_URL=postgres://${DB_USERNAME}:${DB_PASSWORD}@db:5432/rate-me-postgres
+    env_file:
+      - ./.env
     depends_on:
       - database
     restart: unless-stopped
