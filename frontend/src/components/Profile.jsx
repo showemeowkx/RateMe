@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './Profile.module.css';
 import { Link } from 'react-router-dom';
 import { FaRegUser } from 'react-icons/fa';
 
@@ -7,8 +8,8 @@ export default function Profile() {
     <div>
       <Link to='/profile'>
         <div>
-          <button>
-            <FaRegUser />
+          <button className={styles.profileButton}>
+            <FaRegUser className={styles.profileIcon} />
           </button>
         </div>
       </Link>

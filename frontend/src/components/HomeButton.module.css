@@ -1,0 +1,31 @@
+.homeButton {
+  width: 300px;
+  height: 100px;
+  border-radius: 1rem;
+  border: none;
+  background-color: transparent;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.homeButton:active {
+  background-color: #ebebeb;  /* змінює фон при натисканні */
+  transform: scale(0.98);  /* зменшує кнопку трохи */
+}
+
+.homeImg {
+  width: 100%;
+  object-fit: cover;
+}
+
+
+@media (max-width: 800px) {
+  .homeButton {
+    width: 100px;
+    height: 100px;
+  }
+  .homeImg {
+    content: image-set('../assets/rateme.png')
+  }
+}

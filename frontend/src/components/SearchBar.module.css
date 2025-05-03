@@ -1,0 +1,37 @@
+.searchContainer {
+  position: relative;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 800px;
+  min-width: 200px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 8px 16px 8px 40px; /* зменшено падінг */
+  height: 35px; /* менше висота */
+  font-size: 18px; /* менший шрифт */
+  border-radius: 50px;
+  border: 1px solid #ccc;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 18px;
+  color: #888;
+}
+
+@media (max-width: 800px) {
+  .searchContainer {
+    min-width: 150px;
+  }
+  .searchInput {
+    font-size: 14px;
+    height: 20px;
+  }
+}

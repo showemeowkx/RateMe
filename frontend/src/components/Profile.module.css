@@ -1,0 +1,38 @@
+.profileButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  height: 51px;
+  width: 51px;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  background-color: #fff06a;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.profileButton:hover {
+  background-color: #ffe600;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.profileButton:active {
+  background-color: #baaa1b;  /* змінює фон при натисканні */
+  transform: scale(0.98);  /* зменшує кнопку трохи */
+}
+
+.profileIcon {
+  font-size: 30px;
+}
+
+@media (max-width: 800px) {
+  .profileButton {
+    font-size: 14px;
+    width: 37px;
+    height: 37px;
+  }
+  .profileIcon {
+    font-size: 18px;
+  }
+}
