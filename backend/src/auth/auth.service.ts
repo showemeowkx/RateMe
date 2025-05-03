@@ -30,6 +30,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = this.userRepository.create({
+      imagePath: './src/uploads/default.jpg',
       name,
       surname,
       username,
