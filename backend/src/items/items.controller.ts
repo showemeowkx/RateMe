@@ -13,7 +13,9 @@ import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { storageOptions } from './file-upload/storage-options';
+import { setStorageOptions } from 'src/common/file-upload';
+
+const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
 @Controller('items')
 @UseGuards(AuthGuard())
@@ -22,7 +24,12 @@ export class ItemsController {
   constructor(private itemsService: ItemsService) {}
 
   @Post('/add')
-  @UseInterceptors(FileInterceptor('file', storageOptions))
+  @UseInterceptors(
+    FileInterceptor(
+      'file',
+      setStorageOptions('item-images', allowedExtensions),
+    ),
+  )
   addItem(
     @Body() addItemDto: AddItemDto,
     @GetUser() user: User,
