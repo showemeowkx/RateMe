@@ -10,8 +10,8 @@
 }
 
 .homeButton:active {
-  background-color: #ebebeb;  /* змінює фон при натисканні */
-  transform: scale(0.98);  /* зменшує кнопку трохи */
+  background-color: #ebebeb;
+  transform: scale(0.98);
 }
 
 .homeImg {
