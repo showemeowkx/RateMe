@@ -1,4 +1,4 @@
 export enum Categories {
-  PHONES = 'Смартфони та мобільні телефони',
-  OTHERS = 'Інші',
+  PHONES = 'phones',
+  OTHERS = 'others',
 }

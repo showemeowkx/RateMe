@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   ConflictException,
   Injectable,
@@ -10,6 +11,7 @@ import { Item } from './item.entity';
 import { AddItemDto } from './dto/add-item.dto';
 import { User } from 'src/auth/user.entity';
 import * as fs from 'fs/promises';
+import { GetItemsFilterDto } from './dto/get-items-filter.dto';
 
 @Injectable()
 export class ItemsService {
@@ -17,6 +19,49 @@ export class ItemsService {
   constructor(
     @InjectRepository(Item) private itemsRepository: Repository<Item>,
   ) {}
+
+  async getItems(filterDto: GetItemsFilterDto): Promise<Item[]> {
+    const { category, name, minRating, maxRating } = filterDto;
+
+    const query = this.itemsRepository.createQueryBuilder('item');
+
+    if (category) {
+      query.andWhere('item.category = :category', { category });
+    }
+
+    if (name) {
+      query.andWhere('(LOWER(item.name) LIKE LOWER(:name)', {
+        search: `%${name}%`,
+      });
+    }
+
+    if (minRating) {
+      query.andWhere('item.rating >= :minRating', { minRating });
+    }
+
+    if (maxRating) {
+      query.andWhere('item.rating <= :maxRating', { maxRating });
+    }
+
+    query.select([
+      'item.id',
+      'item.imagePath',
+      'item.category',
+      'item.name',
+      'item.rating',
+    ]);
+
+    try {
+      const items = await query.getMany();
+      return items;
+    } catch (error) {
+      this.logger.error(
+        `[INTERNAL] Failed to get tasks. {filters: ${JSON.stringify(filterDto)}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
+  }
 
   async addItem(
     addItemDto: AddItemDto,
@@ -39,7 +84,6 @@ export class ItemsService {
       await this.itemsRepository.save(item);
     } catch (error) {
       if (file?.path) await fs.unlink(file.path);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (error.code === '23505') {
         this.logger.error(
           `[ALREADY EXISTS] Failed to add an item {name: ${name}}`,
@@ -48,7 +92,6 @@ export class ItemsService {
       }
       this.logger.error(
         `[INTERNAL] Failed to add an item {name: ${name}}`,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         error.stack,
       );
       throw new InternalServerErrorException();
