@@ -1,7 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
-import path from 'path';
+import * as path from 'path';
 
 export const setStorageOptions = (dir: string, allowedExtensions: string[]) => {
   return {
