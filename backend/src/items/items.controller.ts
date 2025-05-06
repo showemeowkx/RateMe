@@ -23,7 +23,7 @@ export class ItemsController {
   private logger = new Logger('ItemsController');
   constructor(private itemsService: ItemsService) {}
 
-  @Post('/add')
+  @Post()
   @UseInterceptors(
     FileInterceptor(
       'file',
