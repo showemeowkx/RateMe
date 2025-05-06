@@ -18,7 +18,7 @@ export class ReviewsController {
   private logger = new Logger('ReviewsController');
   constructor(private reviewsService: ReviewsService) {}
 
-  @Post('/new/:itemId')
+  @Post('/:itemId')
   createReview(
     @Body() createReviewDto: CreateReviewDto,
     @GetUser() user: User,

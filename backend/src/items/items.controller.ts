@@ -1,8 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   Logger,
+  Param,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -14,16 +17,32 @@ import { User } from 'src/auth/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { setStorageOptions } from 'src/common/file-upload';
+import { Item } from './item.entity';
+import { GetItemsFilterDto } from './dto/get-items-filter.dto';
 
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
 @Controller('items')
-@UseGuards(AuthGuard())
 export class ItemsController {
   private logger = new Logger('ItemsController');
   constructor(private itemsService: ItemsService) {}
 
-  @Post('/add')
+  @Get()
+  getItems(@Query() filterDto: GetItemsFilterDto): Promise<Item[]> {
+    this.logger.verbose(
+      `Getting items... {filters: ${JSON.stringify(filterDto)}}`,
+    );
+    return this.itemsService.getItems(filterDto);
+  }
+
+  @Get('/:itemId')
+  getItemById(@Param('itemId') itemId: string): Promise<Item> {
+    this.logger.verbose(`Getting an item by id... {itemId: ${itemId}}`);
+    return this.itemsService.getItemById(itemId);
+  }
+
+  @Post()
+  @UseGuards(AuthGuard())
   @UseInterceptors(
     FileInterceptor(
       'file',
