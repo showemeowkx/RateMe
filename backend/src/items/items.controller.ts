@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Logger,
+  Param,
   Post,
   Query,
   UploadedFile,
@@ -32,6 +33,12 @@ export class ItemsController {
       `Getting items... {filters: ${JSON.stringify(filterDto)}}`,
     );
     return this.itemsService.getItems(filterDto);
+  }
+
+  @Get('/:itemId')
+  getItemById(@Param('itemId') itemId: string): Promise<Item> {
+    this.logger.verbose(`Getting an item by id... {itemId: ${itemId}}`);
+    return this.itemsService.getItemById(itemId);
   }
 
   @Post()

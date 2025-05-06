@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -61,6 +62,19 @@ export class ItemsService {
       );
       throw new InternalServerErrorException();
     }
+  }
+
+  async getItemById(itemId: string): Promise<Item> {
+    const item = await this.itemsRepository.findOneBy({ id: itemId });
+
+    if (!item) {
+      this.logger.error(
+        `[NOT FOUND] Failed to get an item... {itemId: ${itemId}}`,
+      );
+      throw new NotFoundException(`Item with id ${itemId} was not found`);
+    }
+
+    return item;
   }
 
   async addItem(
