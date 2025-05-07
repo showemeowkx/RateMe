@@ -1,4 +1,5 @@
 node_modules/
+uploads/
 data/hotline_iphone_reviews.csv
 *.env
 desktop.ini
