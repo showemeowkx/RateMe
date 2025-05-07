@@ -31,8 +31,8 @@ export class ItemsService {
     }
 
     if (name) {
-      query.andWhere('(LOWER(item.name) LIKE LOWER(:name)', {
-        search: `%${name}%`,
+      query.andWhere('LOWER(item.name) LIKE LOWER(:name)', {
+        name: `%${name}%`,
       });
     }
 
