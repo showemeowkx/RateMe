@@ -31,6 +31,6 @@ export class User {
   @OneToMany(() => Review, (review) => review.author, { eager: true })
   reviews: Review[];
 
-  // @Column()
-  // isModerator: boolean;
+  @Column()
+  isModerator: boolean;
 }
