@@ -65,7 +65,10 @@ export class ItemsService {
   }
 
   async getItemById(itemId: string): Promise<Item> {
-    const item = await this.itemsRepository.findOneBy({ id: itemId });
+    const item = await this.itemsRepository.findOne({
+      where: { id: itemId },
+      relations: ['reviews', 'reviews.author'],
+    });
 
     if (!item) {
       this.logger.error(
