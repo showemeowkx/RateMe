@@ -21,6 +21,21 @@ export class ReviewsService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
+  async getReviews(itemId: string): Promise<Review[]> {
+    const reviews = await this.reviewRepository.find({
+      where: { item: { id: itemId } },
+    });
+
+    if (!reviews) {
+      this.logger.error(
+        `[NOT FOUND] Failed to get reviews {itemId: ${itemId}}`,
+      );
+      throw new NotFoundException(`Reviews with id ${itemId} were not found`);
+    }
+
+    return reviews;
+  }
+
   async createReview(
     createReviewDto: CreateReviewDto,
     user: User,
@@ -51,9 +66,8 @@ export class ReviewsService {
       throw new NotFoundException(`Item with id ${itemId} was not found`);
     }
 
-    const { usePeriod, isRecommended, liked, disliked, text } = createReviewDto;
+    const { usePeriod, liked, disliked, text } = createReviewDto;
 
-    const isRecommendedCheck = isRecommended ? true : false;
     const likedChecked = liked ? liked : 'Не визначено';
     const dislikedChecked = disliked ? disliked : 'Не визначено';
 
@@ -62,7 +76,6 @@ export class ReviewsService {
       item: item,
       author: user,
       usePeriod,
-      isRecommended: isRecommendedCheck,
       liked: likedChecked,
       disliked: dislikedChecked,
       text,

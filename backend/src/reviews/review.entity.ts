@@ -11,17 +11,14 @@ export class Review {
   @Column()
   origin: string;
 
-  @ManyToOne(() => Item, (item) => item.reviews, { eager: false })
+  @ManyToOne(() => Item, (item) => item.reviews)
   item: Item;
 
-  @ManyToOne(() => User, (user) => user.reviews, { eager: false })
+  @ManyToOne(() => User, (user) => user.reviews)
   author: User;
 
   @Column({ type: 'enum', enum: UsePeriod })
   usePeriod: UsePeriod;
-
-  @Column()
-  isRecommended: boolean;
 
   @Column()
   liked: string;
