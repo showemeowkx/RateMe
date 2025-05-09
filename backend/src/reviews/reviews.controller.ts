@@ -26,6 +26,13 @@ export class ReviewsController {
   }
 
   @UseGuards(AuthGuard())
+  @Get('user/:userId')
+  getReviewsByUser(@Param('userId') userId: string): Promise<Review[]> {
+    this.logger.verbose(`Getting reviews for user... {userId: ${userId}}`);
+    return this.reviewsService.getReviewsByUser(userId);
+  }
+
+  @UseGuards(AuthGuard())
   @Post('/:itemId')
   createReview(
     @Body() createReviewDto: CreateReviewDto,

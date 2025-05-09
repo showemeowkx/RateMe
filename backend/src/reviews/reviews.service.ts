@@ -3,13 +3,13 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Review } from './review.entity';
 import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { User } from 'src/auth/user.entity';
-import { Item } from 'src/items/item.entity';
 import { ItemsService } from 'src/items/items.service';
 
 @Injectable()
@@ -17,7 +17,7 @@ export class ReviewsService {
   private logger = new Logger('ReviewsService', { timestamp: true });
   constructor(
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
-    @InjectRepository(Item) private itemRepository: Repository<Item>,
+    @InjectRepository(User) private userRepository: Repository<User>,
     private itemsService: ItemsService,
   ) {}
 
@@ -31,7 +31,33 @@ export class ReviewsService {
       return reviews;
     } catch (error) {
       this.logger.error(
-        '[INTERNAL] Failed to get reviews for item',
+        `[INTERNAL] Failed to get reviews for item {itemId: ${itemId}}`,
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async getReviewsByUser(userId: string): Promise<Review[]> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+
+    //will be rapleced with GET method
+    if (!user) {
+      this.logger.error(
+        `[NOT FOUND] Failed to get reviews for user {userId: ${userId}}`,
+      );
+      throw new NotFoundException(`User with id ${userId} was not found`);
+    }
+    try {
+      const reviews = await this.reviewRepository.find({
+        where: { author: { id: userId } },
+        relations: ['item'],
+      });
+      return reviews;
+    } catch (error) {
+      this.logger.error(
+        `[INTERNAL] Failed to get reviews for user {userId: ${userId}}`,
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         error.stack,
       );
@@ -44,11 +70,9 @@ export class ReviewsService {
     user: User,
     itemId: string,
   ): Promise<void> {
-    //will be rapleced with GET method
-    const sameReview = await this.reviewRepository.findOneBy({
-      author: user,
-      item: { id: itemId },
-    });
+    const reviews = await this.getReviewsByUser(user.id);
+    console.log(reviews);
+    const sameReview = reviews.find((review) => review.item.id === itemId);
 
     if (sameReview) {
       this.logger.error(
