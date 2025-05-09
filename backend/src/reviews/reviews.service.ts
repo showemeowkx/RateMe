@@ -18,22 +18,31 @@ export class ReviewsService {
   constructor(
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
     @InjectRepository(Item) private itemRepository: Repository<Item>,
-    @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  async getReviews(itemId: string): Promise<Review[]> {
-    const reviews = await this.reviewRepository.find({
-      where: { item: { id: itemId } },
-    });
+  async getReviewsByItem(itemId: string): Promise<Review[]> {
+    const item = await this.itemRepository.findOneBy({ id: itemId });
 
-    if (!reviews) {
+    if (!item) {
       this.logger.error(
-        `[NOT FOUND] Failed to get reviews {itemId: ${itemId}}`,
+        `[NOT FOUND] Failed to get reviews for item {itemId: ${itemId}}`,
       );
-      throw new NotFoundException(`Reviews with id ${itemId} were not found`);
+      throw new NotFoundException(`Item with id ${itemId} was not found`);
     }
 
-    return reviews;
+    try {
+      const reviews = await this.reviewRepository.find({
+        where: { item: { id: itemId } },
+      });
+      return reviews;
+    } catch (error) {
+      this.logger.error(
+        '[INTERNAL] Failed to get reviews for item',
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
   }
 
   async createReview(
@@ -56,7 +65,6 @@ export class ReviewsService {
       );
     }
 
-    //will be rapleced with GET method
     const item = await this.itemRepository.findOneBy({ id: itemId });
 
     if (!item) {

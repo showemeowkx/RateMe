@@ -19,10 +19,10 @@ export class ReviewsController {
   private logger = new Logger('ReviewsController');
   constructor(private reviewsService: ReviewsService) {}
 
-  @Get('/:itemId')
-  getReviews(@Param('itemId') itemId: string): Promise<Review[]> {
-    this.logger.verbose(`Getting reviews... {itemId: ${itemId}}`);
-    return this.reviewsService.getReviews(itemId);
+  @Get('item/:itemId')
+  getReviewsByItem(@Param('itemId') itemId: string): Promise<Review[]> {
+    this.logger.verbose(`Getting reviews for item... {itemId: ${itemId}}`);
+    return this.reviewsService.getReviewsByItem(itemId);
   }
 
   @UseGuards(AuthGuard())
