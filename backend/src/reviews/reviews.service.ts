@@ -3,7 +3,6 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Review } from './review.entity';
@@ -11,6 +10,7 @@ import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { User } from 'src/auth/user.entity';
 import { Item } from 'src/items/item.entity';
+import { ItemsService } from 'src/items/items.service';
 
 @Injectable()
 export class ReviewsService {
@@ -18,17 +18,11 @@ export class ReviewsService {
   constructor(
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
     @InjectRepository(Item) private itemRepository: Repository<Item>,
+    private itemsService: ItemsService,
   ) {}
 
   async getReviewsByItem(itemId: string): Promise<Review[]> {
-    const item = await this.itemRepository.findOneBy({ id: itemId });
-
-    if (!item) {
-      this.logger.error(
-        `[NOT FOUND] Failed to get reviews for item {itemId: ${itemId}}`,
-      );
-      throw new NotFoundException(`Item with id ${itemId} was not found`);
-    }
+    await this.itemsService.getItemById(itemId);
 
     try {
       const reviews = await this.reviewRepository.find({
@@ -65,14 +59,7 @@ export class ReviewsService {
       );
     }
 
-    const item = await this.itemRepository.findOneBy({ id: itemId });
-
-    if (!item) {
-      this.logger.error(
-        `[NOT FOUND] Failed to create a review {user: ${user.username}, itemId: ${itemId}}`,
-      );
-      throw new NotFoundException(`Item with id ${itemId} was not found`);
-    }
+    const item = await this.itemsService.getItemById(itemId);
 
     const { usePeriod, liked, disliked, text } = createReviewDto;
 
