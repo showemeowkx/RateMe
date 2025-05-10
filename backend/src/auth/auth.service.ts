@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   ConflictException,
   Injectable,
@@ -13,6 +14,7 @@ import { AuthSignUpCredDto } from './dto/auth-sign-up.dto';
 import { AuthSignInCredDto } from './dto/auth-sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
+import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +24,45 @@ export class AuthService {
     private userRepository: Repository<User>,
     private jwtService: JwtService,
   ) {}
+
+  async getUsers(filterDto: GetUsersFilterDto): Promise<User[]> {
+    const { name, username, email } = filterDto;
+
+    const query = this.userRepository.createQueryBuilder('user');
+
+    if (name) {
+      query.andWhere('LOWER(user.name) LIKE LOWER(:name)', {
+        name: `%${name}%`,
+      });
+    }
+
+    if (username) {
+      query.andWhere('LOWER(user.username) LIKE LOWER(:username)', {
+        username: `%${username}%`,
+      });
+    }
+
+    if (email) {
+      query.andWhere('LOWER(user.email) LIKE LOWER(:email)', {
+        email: `%${email}%`,
+      });
+    }
+
+    query
+      .leftJoinAndSelect('user.reviews', 'reviews')
+      .leftJoinAndSelect('user.items', 'items');
+
+    try {
+      const users = await query.getMany();
+      return users;
+    } catch (error) {
+      this.logger.error(
+        `[INTERNAL] Failed to get users. {filters: ${JSON.stringify(filterDto)}}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
+  }
 
   async createUser(authSignInCredDto: AuthSignUpCredDto): Promise<void> {
     const { name, surname, username, email, password } = authSignInCredDto;
@@ -41,7 +82,6 @@ export class AuthService {
     try {
       await this.userRepository.save(user);
     } catch (error) {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (error.code === '23505') {
         this.logger.error(
           `[ALREADY EXISTS] Failed to create a user {username: ${username}}`,
@@ -50,7 +90,7 @@ export class AuthService {
       } else {
         this.logger.error(
           `[INTERNAL] Failed to create a user {username: ${username}}`,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
           error.stack,
         );
         throw new InternalServerErrorException();
