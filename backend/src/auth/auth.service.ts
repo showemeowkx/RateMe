@@ -31,8 +31,7 @@ export class AuthService {
 
     const user = this.userRepository.create({
       imagePath: './src/uploads/default.jpg',
-      name,
-      surname,
+      name: `${name.trim()} ${surname.trim()}`,
       username,
       email,
       password: hashedPassword,
