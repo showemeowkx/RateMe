@@ -1,9 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Review } from './review.entity';
@@ -11,13 +11,14 @@ import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { User } from 'src/auth/user.entity';
 import { ItemsService } from 'src/items/items.service';
+import { AuthService } from 'src/auth/auth.service';
 
 @Injectable()
 export class ReviewsService {
   private logger = new Logger('ReviewsService', { timestamp: true });
   constructor(
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
-    @InjectRepository(User) private userRepository: Repository<User>,
+    private authService: AuthService,
     private itemsService: ItemsService,
   ) {}
 
@@ -32,7 +33,6 @@ export class ReviewsService {
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to get reviews for item {itemId: ${itemId}}`,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         error.stack,
       );
       throw new InternalServerErrorException();
@@ -40,15 +40,8 @@ export class ReviewsService {
   }
 
   async getReviewsByUser(userId: string): Promise<Review[]> {
-    const user = await this.userRepository.findOneBy({ id: userId });
+    await this.authService.getUserById(userId);
 
-    //will be rapleced with GET method
-    if (!user) {
-      this.logger.error(
-        `[NOT FOUND] Failed to get reviews for user {userId: ${userId}}`,
-      );
-      throw new NotFoundException(`User with id ${userId} was not found`);
-    }
     try {
       const reviews = await this.reviewRepository.find({
         where: { author: { id: userId } },
@@ -58,7 +51,6 @@ export class ReviewsService {
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to get reviews for user {userId: ${userId}}`,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         error.stack,
       );
       throw new InternalServerErrorException();
@@ -105,7 +97,7 @@ export class ReviewsService {
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to create a review {item: ${item.name}, user: ${user.username}}`,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+
         error.stack,
       );
       throw new InternalServerErrorException();

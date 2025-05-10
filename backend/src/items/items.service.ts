@@ -57,7 +57,7 @@ export class ItemsService {
       return items;
     } catch (error) {
       this.logger.error(
-        `[INTERNAL] Failed to get tasks. {filters: ${JSON.stringify(filterDto)}`,
+        `[INTERNAL] Failed to get items {filters: ${JSON.stringify(filterDto)}`,
         error.stack,
       );
       throw new InternalServerErrorException();
