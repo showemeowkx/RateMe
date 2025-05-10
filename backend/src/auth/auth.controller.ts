@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   Logger,
+  Param,
   Post,
   Query,
   UseGuards,
@@ -26,6 +27,13 @@ export class AuthController {
       `Getting users... {filters" ${JSON.stringify(filterDto)}}`,
     );
     return this.authService.getUsers(filterDto);
+  }
+
+  @Get('/:userId')
+  @UseGuards(AuthGuard())
+  getUserById(@Param('userId') userId: string): Promise<User> {
+    this.logger.verbose(`Getting user by id... {userId: ${userId}}`);
+    return this.authService.getUserById(userId);
   }
 
   @Post('/signup')

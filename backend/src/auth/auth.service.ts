@@ -4,6 +4,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -57,11 +58,27 @@ export class AuthService {
       return users;
     } catch (error) {
       this.logger.error(
-        `[INTERNAL] Failed to get users. {filters: ${JSON.stringify(filterDto)}}`,
+        `[INTERNAL] Failed to get users {filters: ${JSON.stringify(filterDto)}}`,
         error.stack,
       );
       throw new InternalServerErrorException();
     }
+  }
+
+  async getUserById(userId: string): Promise<User> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['reviews', 'items'],
+    });
+
+    if (!user) {
+      this.logger.error(
+        `[NOT FOUND] Failed to get a user... {userId: ${userId}}`,
+      );
+      throw new NotFoundException(`User with id ${userId} was not found`);
+    }
+
+    return user;
   }
 
   async createUser(authSignInCredDto: AuthSignUpCredDto): Promise<void> {
