@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Logger,
   Param,
   Post,
@@ -11,13 +12,27 @@ import { AuthGuard } from '@nestjs/passport';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/user.entity';
+import { Review } from './review.entity';
 
 @Controller('reviews')
-@UseGuards(AuthGuard())
 export class ReviewsController {
   private logger = new Logger('ReviewsController');
   constructor(private reviewsService: ReviewsService) {}
 
+  @Get('item/:itemId')
+  getReviewsByItem(@Param('itemId') itemId: string): Promise<Review[]> {
+    this.logger.verbose(`Getting reviews for item... {itemId: ${itemId}}`);
+    return this.reviewsService.getReviewsByItem(itemId);
+  }
+
+  @UseGuards(AuthGuard())
+  @Get('user/:userId')
+  getReviewsByUser(@Param('userId') userId: string): Promise<Review[]> {
+    this.logger.verbose(`Getting reviews for user... {userId: ${userId}}`);
+    return this.reviewsService.getReviewsByUser(userId);
+  }
+
+  @UseGuards(AuthGuard())
   @Post('/:itemId')
   createReview(
     @Body() createReviewDto: CreateReviewDto,

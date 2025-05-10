@@ -12,10 +12,6 @@ export class CreateReviewDto {
   @IsEnum(UsePeriod)
   usePeriod: UsePeriod;
 
-  @IsNotEmpty()
-  @IsBoolean()
-  isRecommended?: boolean;
-
   @MaxLength(300)
   @IsString()
   liked?: string;

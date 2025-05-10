@@ -57,7 +57,7 @@ export class ItemsService {
       return items;
     } catch (error) {
       this.logger.error(
-        `[INTERNAL] Failed to get tasks. {filters: ${JSON.stringify(filterDto)}`,
+        `[INTERNAL] Failed to get items {filters: ${JSON.stringify(filterDto)}`,
         error.stack,
       );
       throw new InternalServerErrorException();
@@ -65,7 +65,10 @@ export class ItemsService {
   }
 
   async getItemById(itemId: string): Promise<Item> {
-    const item = await this.itemsRepository.findOneBy({ id: itemId });
+    const item = await this.itemsRepository.findOne({
+      where: { id: itemId },
+      relations: ['reviews', 'reviews.author'],
+    });
 
     if (!item) {
       this.logger.error(
