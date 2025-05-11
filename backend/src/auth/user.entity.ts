@@ -7,6 +7,9 @@ export class User {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @Column()
+  imagePath: string;
+
   @Column({ unique: true })
   email: string;
 
@@ -15,9 +18,6 @@ export class User {
 
   @Column()
   name: string;
-
-  @Column()
-  surname: string;
 
   @Column()
   password: string;

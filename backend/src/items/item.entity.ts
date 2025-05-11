@@ -14,7 +14,7 @@ export class Item {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User, (user) => user.items, { eager: true })
+  @ManyToOne(() => User, (user) => user.items)
   creator: User;
 
   @Column()
@@ -35,6 +35,6 @@ export class Item {
   @Column()
   link: string;
 
-  @OneToMany(() => Review, (review) => review.item, { eager: true })
+  @OneToMany(() => Review, (review) => review.item)
   reviews: Review[];
 }

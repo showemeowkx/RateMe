@@ -1,4 +1,11 @@
 export enum Categories {
-  PHONES = 'Смартфони та мобільні телефони',
-  OTHERS = 'Інші',
+  PHONES = 'phones',
+  LAPTOPS = 'laptops',
+  TABLETS = 'tablets',
+  SMARTWATCHES = 'smartwatches',
+  MICE = 'mice',
+  KEYBOARDS = 'keyboards',
+  HEADPHONES = 'headphones',
+  ACCESSORIES = 'accessories',
+  OTHER = 'other',
 }

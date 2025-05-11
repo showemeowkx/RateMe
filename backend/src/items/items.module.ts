@@ -10,5 +10,6 @@ import { NestjsFormDataModule } from 'nestjs-form-data';
   imports: [TypeOrmModule.forFeature([Item]), AuthModule, NestjsFormDataModule],
   controllers: [ItemsController],
   providers: [ItemsService],
+  exports: [ItemsService],
 })
 export class ItemsModule {}
