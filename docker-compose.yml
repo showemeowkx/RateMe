@@ -1,14 +1,33 @@
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: react-frontend
+    ports:
+      - '${FRONT_PORT}:${FRONT_PORT}'
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=${NODE_ENV}
+      - PORT=${FRONT_PORT}
+    restart: unless-stopped
+    command: ['npm', 'run', 'start']
+    env_file:
+      - ./.env
+
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
     container_name: nest-backend
     ports:
-      - "${PORT}:${PORT}"
+      - '${BACK_PORT}:${BACK_PORT}'
     environment:
       - NODE_ENV=${NODE_ENV}
-      - DATABASE_URL=postgres://${DB_USERNAME}:${DB_PASSWORD}@db:5432/rate-me-postgres
+      - DATABASE_URL=postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}
+      - PORT=${BACK_PORT}
     env_file:
       - ./.env
     depends_on:
@@ -17,17 +36,19 @@ services:
     volumes:
       - ./uploads:/app/uploads
 
+
+
   database:
     image: postgres:latest
     container_name: postgres-db
     environment:
       - POSTGRES_USER=${DB_USERNAME}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
-      - POSTGRES_DB=rate-me-postgres
+      - POSTGRES_DB=${DB_DATABASE}
     volumes:
       - pgdata:/var/lib/postgresql/data
     ports:
-      - "${DB_PORT}:5432"
+      - '${DB_PORT}:5432'
 
 volumes:
   pgdata:
