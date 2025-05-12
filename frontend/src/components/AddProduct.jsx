@@ -7,7 +7,7 @@ export default function AddProduct() {
   const [addingButton, setAddingButton] = useState(
     <p>
       <FaPlusSquare className={styles.addIcon} />
-      &nbsp; Add product
+      &nbsp; Створити товар
     </p>
   );
 
@@ -19,7 +19,7 @@ export default function AddProduct() {
         setAddingButton(
           <p>
             <FaPlusSquare className={styles.addIcon} />
-            &nbsp; Add product
+            &nbsp; Створити товар
           </p>
         );
       }
