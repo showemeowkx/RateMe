@@ -4,13 +4,13 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
-  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './category.entity';
 import { Repository } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import * as fs from 'fs/promises';
+import { GetCategoriesFilterDto } from './dto/get-categories-filter.dto';
 
 @Injectable()
 export class CategoriesService {
@@ -20,32 +20,29 @@ export class CategoriesService {
     private categoriesRepository: Repository<Category>,
   ) {}
 
-  async getCategories(name: string): Promise<Category[]> {
+  async getCategories(filterDto: GetCategoriesFilterDto): Promise<Category[]> {
+    const { name, slug } = filterDto;
     const query = this.categoriesRepository.createQueryBuilder('category');
 
     if (name) {
-      query.andWhere('category.name LIKE :name', { name: `%${name}%` });
+      query.andWhere('LOWER(category.name) LIKE LOWER(:name)', {
+        name: `%${name}%`,
+      });
     }
+
+    if (slug) {
+      query.andWhere('category.slug = :slug', { slug });
+    }
+
     try {
       return query.getMany();
     } catch (error) {
       this.logger.error(
-        `[INTERNAL] Failed to get categories {filters: {name: ${name}}}`,
+        `[INTERNAL] Failed to get categories {filters: ${JSON.stringify(filterDto)}}`,
         error.stack,
       );
       throw new InternalServerErrorException();
     }
-  }
-
-  async getCategoryBySlug(slug: string): Promise<Category> {
-    const category = await this.categoriesRepository.findOneBy({ slug });
-
-    if (!category) {
-      this.logger.error(`[NOT FOUND] Failed to get a category {slug: ${slug}}`);
-      throw new NotFoundException(`Category with slug ${slug} was not found`);
-    }
-
-    return category;
   }
 
   async createCategory(

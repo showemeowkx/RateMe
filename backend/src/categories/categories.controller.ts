@@ -3,7 +3,6 @@ import {
   Controller,
   Get,
   Logger,
-  Param,
   Post,
   Query,
   UploadedFile,
@@ -16,6 +15,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { setStorageOptions } from 'src/common/file-upload';
 import { Category } from './category.entity';
+import { GetCategoriesFilterDto } from './dto/get-categories-filter.dto';
 
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
@@ -26,16 +26,14 @@ export class CategoriesController {
   private logger = new Logger('CategoriesController');
   constructor(private categoriesService: CategoriesService) {}
 
-  @Get('/:slug')
-  getCategoryBySlug(@Param('slug') slug: string): Promise<Category> {
-    this.logger.verbose(`Getting a category by slug... {slug: ${slug}}`);
-    return this.categoriesService.getCategoryBySlug(slug);
-  }
-
   @Get()
-  getCategories(@Query() name: string): Promise<Category[]> {
-    this.logger.verbose(`Getting categories... {filters: {name: ${name}}}`);
-    return this.categoriesService.getCategories(name);
+  getCategories(
+    @Query() filterDto: GetCategoriesFilterDto,
+  ): Promise<Category[]> {
+    this.logger.verbose(
+      `Getting categories... {filters: ${JSON.stringify(filterDto)}}`,
+    );
+    return this.categoriesService.getCategories(filterDto);
   }
 
   @Post()
