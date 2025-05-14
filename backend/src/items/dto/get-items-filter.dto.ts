@@ -1,10 +1,10 @@
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
-import { Categories } from '../../categories/categories.enum';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class GetItemsFilterDto {
   @IsOptional()
-  @IsEnum(Categories)
-  category?: Categories;
+  @IsNotEmpty()
+  @IsString()
+  category?: string;
 
   @IsOptional()
   @IsNotEmpty()

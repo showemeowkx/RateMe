@@ -13,12 +13,14 @@ import { AddItemDto } from './dto/add-item.dto';
 import { User } from 'src/auth/user.entity';
 import * as fs from 'fs/promises';
 import { GetItemsFilterDto } from './dto/get-items-filter.dto';
+import { CategoriesService } from 'src/categories/categories.service';
 
 @Injectable()
 export class ItemsService {
   private logger = new Logger('ItemsService', { timestamp: true });
   constructor(
     @InjectRepository(Item) private itemsRepository: Repository<Item>,
+    private categoriesService: CategoriesService,
   ) {}
 
   async getItems(filterDto: GetItemsFilterDto): Promise<Item[]> {
@@ -27,7 +29,12 @@ export class ItemsService {
     const query = this.itemsRepository.createQueryBuilder('item');
 
     if (category) {
-      query.andWhere('item.category = :category', { category });
+      const categoryEntity = await this.categoriesService.getCategories({
+        slug: category,
+      });
+      query.andWhere('item.category.id = :categoryId', {
+        categoryId: categoryEntity[0].id,
+      });
     }
 
     if (name) {
@@ -44,12 +51,13 @@ export class ItemsService {
       query.andWhere('item.rating <= :maxRating', { maxRating });
     }
 
+    query.leftJoinAndSelect('item.category', 'category');
     query.select([
       'item.id',
       'item.imagePath',
-      'item.category',
       'item.name',
       'item.rating',
+      'category',
     ]);
 
     try {
@@ -67,12 +75,12 @@ export class ItemsService {
   async getItemById(itemId: string): Promise<Item> {
     const item = await this.itemsRepository.findOne({
       where: { id: itemId },
-      relations: ['reviews', 'reviews.author'],
+      relations: ['reviews', 'reviews.author', 'category'],
     });
 
     if (!item) {
       this.logger.error(
-        `[NOT FOUND] Failed to get an item... {itemId: ${itemId}}`,
+        `[NOT FOUND] Failed to get an item {itemId: ${itemId}}`,
       );
       throw new NotFoundException(`Item with id ${itemId} was not found`);
     }
@@ -85,12 +93,15 @@ export class ItemsService {
     user: User,
     file: Express.Multer.File,
   ): Promise<void> {
-    const { category, name, description } = addItemDto;
+    const { categorySlug, name, description } = addItemDto;
+    const category = await this.categoriesService.getCategories({
+      slug: categorySlug,
+    });
 
     const item = this.itemsRepository.create({
       creator: user,
       imagePath: file.path,
-      category,
+      category: category[0],
       name,
       description,
       rating: 0,
