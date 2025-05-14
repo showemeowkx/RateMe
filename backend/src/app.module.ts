@@ -5,6 +5,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configValidationSchema } from './config.schema';
 import { ItemsModule } from './items/items.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { CategoriesController } from './categories/categories.controller';
+import { CategoriesModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -31,6 +33,8 @@ import { ReviewsModule } from './reviews/reviews.module';
         };
       },
     }),
+    CategoriesModule,
   ],
+  controllers: [CategoriesController],
 })
 export class AppModule {}

@@ -1,5 +1,5 @@
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional } from 'class-validator';
-import { Categories } from '../categories.enum';
+import { Categories } from '../../categories/categories.enum';
 
 export class GetItemsFilterDto {
   @IsOptional()

@@ -5,7 +5,7 @@ import {
   MaxLength,
   MinLength,
 } from 'class-validator';
-import { Categories } from '../categories.enum';
+import { Categories } from '../../categories/categories.enum';
 
 export class AddItemDto {
   @IsEnum(Categories)
