@@ -1,15 +1,8 @@
-import {
-  IsEnum,
-  IsNotEmpty,
-  IsString,
-  MaxLength,
-  MinLength,
-} from 'class-validator';
-import { Categories } from '../categories.enum';
+import { IsNotEmpty, IsString, MaxLength, MinLength } from 'class-validator';
 
 export class AddItemDto {
-  @IsEnum(Categories)
-  category: Categories;
+  @IsString()
+  categorySlug: string;
 
   @IsString()
   @MinLength(5)
