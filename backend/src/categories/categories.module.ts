@@ -4,9 +4,14 @@ import { CategoriesController } from './categories.controller';
 import { Category } from './category.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NestjsFormDataModule } from 'nestjs-form-data';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Category]), NestjsFormDataModule],
+  imports: [
+    TypeOrmModule.forFeature([Category]),
+    AuthModule,
+    NestjsFormDataModule,
+  ],
   controllers: [CategoriesController],
   providers: [CategoriesService],
   exports: [CategoriesService],
