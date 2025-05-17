@@ -7,9 +7,10 @@ export default function Home() {
   const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    fetch('/data/categories.json')
-      .then((response) => response.json())
-      .then((data) => setCategories(data));
+    fetch('http://localhost:3001/categories')
+      .then((res) => res.json())
+      .then((data) => setCategories(data))
+      .catch((err) => console.error(err));
   }, []);
 
   return (
