@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../../components/HomePage/Header';
-import Footer from '../../components/HomePage/Footer';
+import Header from '../../components/Header';
+import Footer from '../../components/Footer';
 import CategoryGrid from '../../components/HomePage/CategoryGrid';
 
 export default function Home() {
