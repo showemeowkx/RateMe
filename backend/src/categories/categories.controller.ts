@@ -19,8 +19,6 @@ import { GetCategoriesFilterDto } from './dto/get-categories-filter.dto';
 
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
-//will be guarded by moderator guard later
-@UseGuards(AuthGuard())
 @Controller('categories')
 export class CategoriesController {
   private logger = new Logger('CategoriesController');
@@ -37,6 +35,8 @@ export class CategoriesController {
   }
 
   @Post()
+  //will be guarded by moderator guard later
+  @UseGuards(AuthGuard())
   @UseInterceptors(
     FileInterceptor(
       'file',
