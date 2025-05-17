@@ -5,9 +5,9 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Categories } from './categories.enum';
 import { User } from 'src/auth/user.entity';
 import { Review } from 'src/reviews/review.entity';
+import { Category } from 'src/categories/category.entity';
 
 @Entity()
 export class Item {
@@ -20,8 +20,8 @@ export class Item {
   @Column()
   imagePath: string;
 
-  @Column({ type: 'enum', enum: Categories })
-  category: Categories;
+  @ManyToOne(() => Category, (category) => category.items)
+  category: Category;
 
   @Column({ unique: true })
   name: string;

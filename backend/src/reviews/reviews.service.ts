@@ -63,7 +63,6 @@ export class ReviewsService {
     itemId: string,
   ): Promise<void> {
     const reviews = await this.getReviewsByUser(user.id);
-    console.log(reviews);
     const sameReview = reviews.find((review) => review.item.id === itemId);
 
     if (sameReview) {
