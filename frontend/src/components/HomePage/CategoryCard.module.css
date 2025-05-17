@@ -1,0 +1,33 @@
+.category {
+  align-items: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.categoryButton {
+  padding: 5px;
+  background-color: #dddddd;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 10px 10px 0 rgba(0, 0, 0, .5);
+  align-items: center;
+  transition: transform 0.2s ease-in-out;
+  cursor: pointer;
+}
+
+.categoryButton:hover {
+  transform: scale(1.03);
+}
+
+.categoryImg {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  object-position: center;
+}
+
+.categoryTitle {
+  font-size: 1.2rem;
+  font-family:Georgia, 'Times New Roman', Times, serif;
+  font-weight: bold;
+}
