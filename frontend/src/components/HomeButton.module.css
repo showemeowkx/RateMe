@@ -10,7 +10,6 @@
 }
 
 .homeButton:active {
-  background-color: #ebebeb;
   transform: scale(0.98);
 }
 

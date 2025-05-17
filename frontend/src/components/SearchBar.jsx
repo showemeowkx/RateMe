@@ -9,7 +9,7 @@ export default function SearchBar() {
       <input
         type='text'
         className={styles.searchInput}
-        placeholder='Search...'
+        placeholder='Пошук...'
       />
     </div>
   );
