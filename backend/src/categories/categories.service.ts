@@ -68,7 +68,9 @@ export class CategoriesService {
           `[ALREADY EXISTS] Failed to create a category {slug: ${slug}}`,
           error.stack,
         );
-        throw new ConflictException('A category with this slug already exists');
+        throw new ConflictException(
+          'A category with this slug/name already exists',
+        );
       }
       this.logger.error(
         `[INTERNAL] Failed to create a category {slug: ${slug}}`,
