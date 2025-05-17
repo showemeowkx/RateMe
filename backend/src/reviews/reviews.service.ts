@@ -82,7 +82,6 @@ export class ReviewsService {
     const dislikedChecked = disliked ? disliked : 'Не визначено';
 
     const review = this.reviewRepository.create({
-      origin: 'rateMe',
       item: item,
       author: user,
       usePeriod,
