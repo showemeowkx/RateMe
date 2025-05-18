@@ -5,7 +5,7 @@ import ProductsGrid from '../../components/ProductsPage/ProductsGrid';
 import { fetchProducts } from '../../services/api';
 import styles from './Products.module.css';
 
-export default function Home() {
+export default function Products() {
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
 
