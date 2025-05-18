@@ -3,6 +3,7 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import CategoryGrid from '../../components/HomePage/CategoryGrid';
 import fetchCategories from '../../services/api';
+import styles from './Home.module.css';
 
 export default function Home() {
   const [categories, setCategories] = useState([]);
@@ -19,7 +20,7 @@ export default function Home() {
       });
   }, []);
 
-  if (error) return <div>Error: {error}</div>;
+  if (error) return <div className={styles.error}>Error: {error}</div>;
 
   return (
     <div>
