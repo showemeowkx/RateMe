@@ -1,4 +1,8 @@
-import { ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Request } from 'express';
 import { User } from 'src/auth/user.entity';
@@ -10,8 +14,16 @@ export class ModeratorGuard extends AuthGuard('jwt') {
     if (!isAuthenticated) {
       return false;
     }
+
     const request = context.switchToHttp().getRequest<Request>();
     const user = request.user as User;
-    return user.isModerator === true;
+
+    if (!user || user.isModerator !== true) {
+      throw new UnauthorizedException(
+        'Access denied: Moderator privileges required',
+      );
+    }
+
+    return true;
   }
 }
