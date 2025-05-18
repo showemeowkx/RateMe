@@ -3,6 +3,7 @@ import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import ProductsGrid from '../../components/ProductsPage/ProductsGrid';
 import { fetchProducts } from '../../services/api';
+import styles from './Products.module.css';
 
 export default function Home() {
   const [products, setProducts] = useState([]);
@@ -19,7 +20,7 @@ export default function Home() {
       });
   }, []);
 
-  if (error) return <div>Error: {error}</div>;
+  if (error) return <div className={styles.error}>Error: {error}</div>;
 
   return (
     <div>
