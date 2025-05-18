@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Header from '../../components/Header';
 import Footer from '../../components/Footer';
 import CategoryGrid from '../../components/HomePage/CategoryGrid';
-import fetchCategories from '../../services/api';
+import { fetchCategories } from '../../services/api';
 import styles from './Home.module.css';
 
 export default function Home() {
