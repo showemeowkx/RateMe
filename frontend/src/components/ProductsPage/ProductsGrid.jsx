@@ -22,9 +22,13 @@ export default function ProductsGrid({ products }) {
 
   return (
     <div>
-      <div>
+      <div className={styles.sorting}>
         <label>Сортування</label>
-        <select value={sorting} onChange={handleSortingChange}>
+        <select
+          className={styles.dropdown}
+          value={sorting}
+          onChange={handleSortingChange}
+        >
           <option value='★ Найкращі'>★ Найкращі</option>
           <option value='☆ Найгірші'>☆ Найгірші</option>
         </select>

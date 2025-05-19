@@ -10,8 +10,53 @@
   overflow-x: hidden;
 }
 
+.sorting {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  margin: 20px auto -5px auto;
+  max-width: 100%;
+  width: 100%;
+  padding: 0 20px;
+  border-radius: 30px;
+  font-size: 22px;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  background-color: #e0e0e0;
+  box-sizing: border-box;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.sorting label {
+  width: 120px;
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.dropdown {
+  padding: 8px;
+  margin: 10px 0;
+  width: 140px; 
+  flex-shrink: 0;
+  border-radius: 10px;
+  background-color: #ececec;
+  font-size: 16px;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  cursor: pointer;
+}
+
+
+.dropdown:hover,
+.dropdown:focus {
+  background-color: #dedede;
+}
+
 @media (min-width: 1400px) {
   .productGrid {
+    max-width: 1400px;
+  }
+  .sorting {
     max-width: 1400px;
   }
 }
