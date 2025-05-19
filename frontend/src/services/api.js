@@ -1,15 +1,11 @@
-export const fetchCategories = async () => {
-  const response = await fetch('http://localhost:3001/categories');
+const fetchData = async (url) => {
+  const response = await fetch(url);
   if (!response.ok) {
-    throw new Error('Failed to fetch categories');
+    throw new Error(`Failed to fetch from ${url}`);
   }
   return response.json();
 };
 
-export const fetchProducts = async () => {
-  const response = await fetch('http://localhost:3001/items');
-  if (!response.ok) {
-    throw new Error('Failed to fetch products');
-  }
-  return response.json();
-};
+export const fetchCategories = () =>
+  fetchData('http://localhost:3001/categories');
+export const fetchProducts = () => fetchData('http://localhost:3001/items');
