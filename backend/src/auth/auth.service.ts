@@ -54,8 +54,7 @@ export class AuthService {
       .leftJoinAndSelect('user.items', 'items');
 
     try {
-      const users = await query.getMany();
-      return users;
+      return await query.getMany();
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to get users {filters: ${JSON.stringify(filterDto)}}`,

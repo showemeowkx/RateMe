@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class GetItemsFilterDto {
   @IsOptional()
@@ -12,11 +12,9 @@ export class GetItemsFilterDto {
 
   @IsOptional()
   @IsNotEmpty()
-  @IsNumber()
   minRating?: number;
 
   @IsOptional()
   @IsNotEmpty()
-  @IsNumber()
   maxRating?: number;
 }

@@ -10,9 +10,9 @@ import {
 import { ReviewsService } from './reviews.service';
 import { AuthGuard } from '@nestjs/passport';
 import { CreateReviewDto } from './dto/create-review.dto';
-import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/user.entity';
 import { Review } from './review.entity';
+import { GetUser } from 'src/decorators/get-user.decorator';
 
 @Controller('reviews')
 export class ReviewsController {

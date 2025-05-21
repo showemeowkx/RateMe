@@ -12,13 +12,13 @@ import {
 } from '@nestjs/common';
 import { ItemsService } from './items.service';
 import { AddItemDto } from './dto/add-item.dto';
-import { GetUser } from 'src/auth/get-user.decorator';
 import { User } from 'src/auth/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { setStorageOptions } from 'src/common/file-upload';
 import { Item } from './item.entity';
 import { GetItemsFilterDto } from './dto/get-items-filter.dto';
+import { GetUser } from 'src/decorators/get-user.decorator';
 
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
