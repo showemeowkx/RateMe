@@ -6,10 +6,10 @@ export class AddItemDto {
 
   @IsString()
   @MinLength(5)
-  @MaxLength(30)
+  @MaxLength(50)
   name: string;
 
   @IsNotEmpty()
-  @MaxLength(1000)
+  @MaxLength(2000)
   description: string;
 }
