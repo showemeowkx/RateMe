@@ -11,11 +11,11 @@ import {
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { setStorageOptions } from 'src/common/file-upload';
 import { Category } from './category.entity';
 import { GetCategoriesFilterDto } from './dto/get-categories-filter.dto';
+import { ModeratorGuard } from 'src/decorators/guards/moderator.guard';
 
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
@@ -35,8 +35,7 @@ export class CategoriesController {
   }
 
   @Post()
-  //will be guarded by moderator guard later
-  @UseGuards(AuthGuard())
+  @UseGuards(ModeratorGuard)
   @UseInterceptors(
     FileInterceptor(
       'file',
