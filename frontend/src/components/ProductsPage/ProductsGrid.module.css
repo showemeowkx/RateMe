@@ -52,6 +52,10 @@
   background-color: #dedede;
 }
 
+.defaultImg {
+  width: 1000px;
+}
+
 @media (min-width: 1400px) {
   .productGrid {
     max-width: 1400px;
