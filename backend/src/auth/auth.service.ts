@@ -16,6 +16,7 @@ import { AuthSignInCredDto } from './dto/auth-sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
+import * as fs from 'fs/promises';
 
 @Injectable()
 export class AuthService {
@@ -128,6 +129,23 @@ export class AuthService {
     } else {
       this.logger.error(`[WRONG INPUT] Failed to sign in {login: ${login}}`);
       throw new UnauthorizedException('Wrong login or password!');
+    }
+  }
+
+  async updatePfp(user: User, file: Express.Multer.File): Promise<void> {
+    const oldImagePath = user.imagePath;
+    const newImagePath = file.path;
+    try {
+      await this.userRepository.update(user.id, { imagePath: newImagePath });
+      if (oldImagePath !== 'uploads/defaults/user_default.jpg')
+        await fs.unlink(oldImagePath);
+    } catch (error) {
+      if (file?.path) await fs.unlink(file.path);
+      this.logger.error(
+        `[INTERNAL] Failed to update a profile picture... {username: ${user.username}}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException();
     }
   }
 }
