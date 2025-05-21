@@ -20,7 +20,7 @@ import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { setStorageOptions } from 'src/common/file-upload';
 import { GetUser } from 'src/decorators/get-user.decorator';
-
+import { UpdateCredentialsDto } from './dto/update-credentials.dto';
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
 @Controller('auth')
@@ -76,5 +76,15 @@ export class AuthController {
       `Updating a profile picture... {username: ${user.username}}`,
     );
     return this.authService.updatePfp(user, file);
+  }
+
+  @Patch('/update-credentials')
+  @UseGuards(AuthGuard())
+  updateCredentials(
+    @GetUser() user: User,
+    @Body() updateCredentialsDto: UpdateCredentialsDto,
+  ): Promise<{ accessToken }> {
+    this.logger.verbose(`Updating credentials... {username: ${user.username}}`);
+    return this.authService.updateCredentials(user, updateCredentialsDto);
   }
 }
