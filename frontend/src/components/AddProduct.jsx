@@ -1,42 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './AddProduct.module.css';
 import { Link } from 'react-router-dom';
 import { FaPlusSquare } from 'react-icons/fa';
 
 export default function AddProduct() {
-  const [addingButton, setAddingButton] = useState(
-    <p>
-      <FaPlusSquare className={styles.addIcon} />
-      &nbsp; Створити товар
-    </p>
-  );
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 576);
 
   useEffect(() => {
-    const updateAddingButton = () => {
-      if (window.innerWidth < 576) {
-        setAddingButton(<FaPlusSquare className={styles.addIcon} />);
-      } else {
-        setAddingButton(
-          <p>
-            <FaPlusSquare className={styles.addIcon} />
-            &nbsp; Створити товар
-          </p>
-        );
-      }
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 576);
     };
-    updateAddingButton();
-    window.addEventListener('resize', updateAddingButton);
 
-    return () => {
-      window.removeEventListener('resize', updateAddingButton);
-    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return (
     <div>
       <Link className={styles.link} to='/add-product'>
         <div className={styles.addContainer}>
-          <button className={styles.addButton}>{addingButton}</button>
+          <button className={styles.addButton}>
+            <FaPlusSquare className={styles.addIcon} />
+            {!isMobile && <>&nbsp; Створити товар</>}
+          </button>
         </div>
       </Link>
     </div>
