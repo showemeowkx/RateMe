@@ -6,6 +6,7 @@ from stop_words import get_stop_words
 import joblib
 from sklearn.metrics import classification_report
 import pymorphy2
+import json
 DetectorFactory.seed = 0
 
 # pymorphy2 для обох мов
@@ -64,16 +65,20 @@ def processing(review):
     return review
 
 
-def get_review(data):
-    data.loc[:,"recommend"] = data["recommend"].replace("", np.nan)
-    data.loc[:,"recommend"] = data["recommend"].apply(lambda x: 1 if x == "рекомендує цей товар" else (0 if x == "не рекомендує" else np.nan))
-    data = data[["recommend", "liked", "disliked", "experience", "comment"]].copy()
+def get_review(values_list):
+    experience, liked, disliked, comment = values_list
+    data = pd.DataFrame([{
+        "experience": experience,
+        "liked": liked,
+        "disliked": disliked,
+        "comment": comment
+    }])
     data["experience"] = data["experience"].apply(process_exp)
 
     for col in ["liked", "disliked", "comment"]:
         data[col] = data[col].apply(clean_text)
 
-    df = data[["recommend", "experience", "liked", "disliked", "comment"]].copy()
+    df = data[["experience", "liked", "disliked", "comment"]].copy()
 
     df["language"] = df["comment"].apply(detect_lang)
     df["language"] = df["language"].apply(lambda x: "uk" if x not in ["uk", "ru"] else ("ru" if x == "ru" else "uk"))
@@ -92,17 +97,15 @@ def get_review(data):
     return df
 
 def load_models():
-    tfidf_liked = joblib.load('pkl_models/tfidf_liked.pkl')
-    tfidf_disliked = joblib.load('pkl_models/tfidf_disliked.pkl')
-    tfidf_comment = joblib.load('pkl_models/tfidf_comment.pkl')
-    model = joblib.load('pkl_models/model.pkl')
+    tfidf_liked = joblib.load('data/NLP_Hotline_SentimentAnalisys-main/pkl_models/tfidf_liked.pkl')
+    tfidf_disliked = joblib.load('data/NLP_Hotline_SentimentAnalisys-main/pkl_models/tfidf_disliked.pkl')
+    tfidf_comment = joblib.load('data/NLP_Hotline_SentimentAnalisys-main/pkl_models/tfidf_comment.pkl')
+    model = joblib.load('data/NLP_Hotline_SentimentAnalisys-main/pkl_models/model.pkl')
     return tfidf_liked, tfidf_disliked, tfidf_comment, model
 
-def label_null_values(path, tfidf_liked, tfidf_disliked, tfidf_comment, model):
-    data = pd.read_csv(path)
-    unmarked = data[data["recommend"].isnull()]
-    df = get_review(unmarked)
-    unmarked_data = df[["recommend", "liked", "disliked", "experience", "comment"]].copy()
+def label_data(values_list, tfidf_liked, tfidf_disliked, tfidf_comment, model):
+    df = get_review(values_list)
+    unmarked_data = df[["experience", "liked", "disliked", "comment"]].copy()
 
     x_tfidf_liked = pd.DataFrame(tfidf_liked.transform(unmarked_data["liked"]).toarray(), columns=["liked_" + f for f in tfidf_liked.get_feature_names_out()])
     x_tfidf_disliked = pd.DataFrame(tfidf_disliked.transform(unmarked_data["disliked"]).toarray(), columns=["disliked_" + f for f in tfidf_disliked.get_feature_names_out()])
@@ -116,11 +119,12 @@ def label_null_values(path, tfidf_liked, tfidf_disliked, tfidf_comment, model):
     ], axis=1)
     y_pred_prob = model.predict_proba(x_tfidf)[:, 1]
     y_pred = (y_pred_prob > 0.4).astype(int)
-    data.loc[unmarked.index, "recommend"] = y_pred
-    data.loc[:, "recommend"] = data["recommend"].apply(lambda x: "рекомендує цей товар" if x == 1 else ("не рекомендує цей товар" if x == 0 else x))
-    return data
+    return y_pred
 
-def main():
+def main(example):
     tfidf_liked, tfidf_disliked, tfidf_comment, model = load_models()
-    data = label_null_values("reviews_to_mark/hotline_iphone_reviews.csv", tfidf_liked, tfidf_disliked, tfidf_comment, model)
-    data.to_csv("reviews_marked_iphone.csv", index=False)
+    values_list = [example[k] for k in ["experience", "liked", "disliked", "comment"]]
+    is_recommended = label_data(values_list, tfidf_liked, tfidf_disliked, tfidf_comment, model)
+    print(is_recommended)
+
+main(example)
