@@ -25,6 +25,6 @@
     height: 100px;
   }
   .homeImg {
-    content: image-set('../assets/rateme.png')
+    content: image-set('../../public/assets/rateme.png');
   }
 }
