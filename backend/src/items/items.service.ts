@@ -61,8 +61,7 @@ export class ItemsService {
     ]);
 
     try {
-      const items = await query.getMany();
-      return items;
+      return await query.getMany();
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to get items {filters: ${JSON.stringify(filterDto)}`,
