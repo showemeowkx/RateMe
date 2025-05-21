@@ -1,13 +1,11 @@
-import { IsString, MaxLength, MinLength } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class AuthSignInCredDto {
   @IsString()
-  @MinLength(5)
-  @MaxLength(20)
+  @IsNotEmpty()
   login: string;
 
   @IsString()
-  @MinLength(6)
-  @MaxLength(32)
+  @IsNotEmpty()
   password: string;
 }
