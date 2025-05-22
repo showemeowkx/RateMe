@@ -5,6 +5,7 @@
   justify-content: center;
   gap: 20px;
   padding: 10px 20px;
+  font-family: Georgia, 'Times New Roman', Times, serif;
 }
 
 @media (max-width: 800px)  {

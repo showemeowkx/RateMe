@@ -1,11 +1,12 @@
 .homeButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 300px;
   height: 100px;
   border-radius: 1rem;
   border: none;
   background-color: transparent;
-  align-items: center;
-  justify-content: center;
   cursor: pointer;
 }
 
@@ -15,7 +16,7 @@
 
 .homeImg {
   width: 100%;
-  object-fit: cover;
+  object-fit: cover;  
 }
 
 

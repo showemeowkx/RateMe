@@ -55,6 +55,7 @@
   align-items: center;
   text-align: center;
   overflow: hidden; 
+  color: #000;
 }
 
 .productTitle {

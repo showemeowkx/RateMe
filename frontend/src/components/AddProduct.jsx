@@ -16,15 +16,11 @@ export default function AddProduct() {
   }, []);
 
   return (
-    <div>
-      <Link className={styles.link} to='/add-product'>
-        <div className={styles.addContainer}>
-          <button className={styles.addButton}>
-            <FaPlusSquare className={styles.addIcon} />
-            {!isMobile && <>&nbsp; Створити товар</>}
-          </button>
-        </div>
-      </Link>
-    </div>
+    <Link className={styles.link} to='/add-product'>
+      <div className={styles.addButton}>
+        <FaPlusSquare className={styles.addIcon} />
+        {!isMobile && <>&nbsp; Створити товар</>}
+      </div>
+    </Link>
   );
 }

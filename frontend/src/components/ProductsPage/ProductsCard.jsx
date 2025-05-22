@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 export default function ProductsCard({ product }) {
   return (
     <Link to={`/products/${product.id}`} className={styles.product}>
-      <button className={styles.productButton}>
+      <div className={styles.productButton}>
         <div className={styles.imgContainer}>
           <img
             className={styles.productImg}
@@ -19,7 +19,7 @@ export default function ProductsCard({ product }) {
           </div>
           <div className={styles.productRating}>Rating: {product.rating}</div>
         </div>
-      </button>
+      </div>
     </Link>
   );
 }
