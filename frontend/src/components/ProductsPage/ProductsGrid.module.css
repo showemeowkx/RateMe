@@ -64,3 +64,14 @@
     max-width: 1400px;
   }
 }
+
+.loadMoreBtn {
+  margin: 20px auto;
+  display: block;
+  padding: 10px 20px;
+  background: #444;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+}

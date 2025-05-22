@@ -1,9 +1,10 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import ProductsCard from './ProductsCard';
 import styles from './ProductsGrid.module.css';
+import { productGen } from '../../utilities/productsLoading';
 
-export const ProductSortKind = {
+const ProductSortKind = {
   BEST: '★ Найкращі',
   WORST: '☆ Найгірші',
 };
@@ -12,7 +13,10 @@ const useQuery = () => new URLSearchParams(useLocation().search);
 
 export default function ProductsGrid({ products }) {
   const [sorting, setSorting] = useState(ProductSortKind.BEST);
+  const [visibleProducts, setVisibleProducts] = useState([]);
+  const [iterator, setIterator] = useState(null);
   const query = useQuery().get('search')?.toLowerCase() || '';
+  const productsAmount = 35;
 
   const handleSortingChange = (e) => {
     setSorting(e.target.value);
@@ -35,6 +39,22 @@ export default function ProductsGrid({ products }) {
     return [...filteredProducts].sort(sortingFn);
   }, [filteredProducts, sorting]);
 
+  useEffect(() => {
+    const initIter = async () => {
+      const gen = productGen(sortedProducts, productsAmount);
+      setIterator(gen);
+      const { value } = await gen.next();
+      setVisibleProducts(value || []);
+    };
+    initIter();
+  }, [sortedProducts]);
+
+  const loadMore = async () => {
+    if (!iterator) return;
+    const { value, done } = await iterator.next();
+    if (!done && value) setVisibleProducts((current) => [...current, ...value]);
+  };
+
   return (
     <>
       {sortedProducts.length ? (
@@ -55,10 +75,15 @@ export default function ProductsGrid({ products }) {
             </select>
           </div>
           <div className={styles.productGrid}>
-            {sortedProducts.map((product) => (
+            {visibleProducts.map((product) => (
               <ProductsCard product={product} key={product.id} />
             ))}
           </div>
+          {visibleProducts.length < sortedProducts.length && (
+            <button className={styles.loadMoreBtn} onClick={loadMore}>
+              Завантажити ще
+            </button>
+          )}
         </div>
       ) : (
         <img
