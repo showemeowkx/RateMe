@@ -78,6 +78,15 @@ export class AuthController {
     return this.authService.updatePfp(user, file);
   }
 
+  @Patch('moderator')
+  @UseGuards(AuthGuard())
+  setModeratorStatus(@GetUser() user: User): Promise<void> {
+    this.logger.verbose(
+      `Setting moderator status... {username: ${user.username}}`,
+    );
+    return this.authService.setModeratorStatus(user);
+  }
+
   @Patch('/update-credentials')
   @UseGuards(AuthGuard())
   updateCredentials(

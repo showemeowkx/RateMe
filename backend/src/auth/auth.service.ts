@@ -151,6 +151,19 @@ export class AuthService {
     }
   }
 
+  // way too simple. will be reworked later
+  async setModeratorStatus(user: User): Promise<void> {
+    try {
+      await this.userRepository.update(user.id, { isModerator: true });
+    } catch (error) {
+      this.logger.error(
+        `[INTERNAL] Failed to set moderator status... {username: ${user.username}}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
+  }
+
   async updateCredentials(
     user: User,
     updateCredentialsDto: UpdateCredentialsDto,
