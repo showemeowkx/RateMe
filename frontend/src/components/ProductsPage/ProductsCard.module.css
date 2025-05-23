@@ -86,3 +86,25 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+@media (max-width: 800px) {
+  .product {
+    height: 300px;
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 576px) {
+  .product {
+    height: 200px;
+    max-width: 100px;
+  }
+
+  .productTitle {
+    font-size: 0.5rem;
+  } 
+
+  .productRating {
+    font-size: 0.5rem;
+  }
+}
