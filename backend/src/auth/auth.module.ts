@@ -8,7 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configValidationSchema } from 'src/config.schema';
 import { JwtStrategy } from './jwt.strategy';
-import { ModeratorGuard } from 'src/decorators/guards/moderator.guard';
+import { ModeratorGuard } from 'src/common/decorators/guards/moderator.guard';
 
 @Module({
   imports: [

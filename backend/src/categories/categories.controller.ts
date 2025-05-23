@@ -15,7 +15,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { setStorageOptions } from 'src/common/file-upload';
 import { Category } from './category.entity';
 import { GetCategoriesFilterDto } from './dto/get-categories-filter.dto';
-import { ModeratorGuard } from 'src/decorators/guards/moderator.guard';
+import { ModeratorGuard } from 'src/common/decorators/guards/moderator.guard';
 
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 

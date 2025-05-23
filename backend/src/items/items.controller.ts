@@ -18,7 +18,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { setStorageOptions } from 'src/common/file-upload';
 import { Item } from './item.entity';
 import { GetItemsFilterDto } from './dto/get-items-filter.dto';
-import { GetUser } from 'src/decorators/get-user.decorator';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
