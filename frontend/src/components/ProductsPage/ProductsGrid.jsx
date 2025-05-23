@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import ProductsCard from './ProductsCard';
 import styles from './ProductsGrid.module.css';
 import { productGen } from '../../utilities/productsLoading';
+import { fetchProducts } from '../../services/api';
 
 const ProductSortKind = {
   BEST: '★ Найкращі',
@@ -11,12 +12,26 @@ const ProductSortKind = {
 
 const useQuery = () => new URLSearchParams(useLocation().search);
 
-export default function ProductsGrid({ products }) {
+export default function ProductsGrid() {
+  const [products, setProducts] = useState([]);
+  const [error, setError] = useState(null);
   const [sorting, setSorting] = useState(ProductSortKind.BEST);
   const [visibleProducts, setVisibleProducts] = useState([]);
   const [iterator, setIterator] = useState(null);
   const query = useQuery().get('search')?.toLowerCase() || '';
+  const category = useQuery().get('category')?.toLowerCase() || '';
   const productsAmount = 35;
+
+  useEffect(() => {
+    fetchProducts(category)
+      .then((data) => {
+        setProducts(data);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError(err.message);
+      });
+  }, [category]);
 
   const handleSortingChange = (e) => {
     setSorting(e.target.value);
@@ -54,6 +69,8 @@ export default function ProductsGrid({ products }) {
     const { value, done } = await iterator.next();
     if (!done && value) setVisibleProducts((current) => [...current, ...value]);
   };
+
+  if (error) return <div className={styles.error}>Error: {error}</div>;
 
   return (
     <>

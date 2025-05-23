@@ -8,4 +8,8 @@ const fetchData = async (url) => {
 
 export const fetchCategories = () =>
   fetchData('http://localhost:3001/categories');
-export const fetchProducts = () => fetchData('http://localhost:3001/items');
+export const fetchProducts = (category) => {
+  if (category)
+    return fetchData(`http://localhost:3001/items?category=${category}`);
+  else return fetchData(`http://localhost:3001/items`);
+};
