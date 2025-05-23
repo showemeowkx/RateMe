@@ -19,10 +19,18 @@ export default function SearchBar() {
   const handleEnterDown = (e) => {
     if (e.key === 'Enter' && searchContent.trim()) {
       clearSearch();
-      const encoded = encodeURIComponent(searchContent.trim());
-      location.pathname === '/products'
-        ? navigate(`/products?search=${encoded}`, { replace: true })
-        : navigate(`/products?search=${encoded}`);
+      const searchingText = searchContent.trim();
+      const searchParams = new URLSearchParams(location.search);
+
+      searchParams.set('search', searchingText);
+
+      const url = `/products?${searchParams.toString()}`;
+
+      if (location.pathname === '/products') {
+        navigate(url, { replace: true });
+      } else {
+        navigate(url);
+      }
     }
   };
 
