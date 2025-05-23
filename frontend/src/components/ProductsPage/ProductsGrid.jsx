@@ -18,12 +18,12 @@ export default function ProductsGrid() {
   const [sorting, setSorting] = useState(ProductSortKind.BEST);
   const [visibleProducts, setVisibleProducts] = useState([]);
   const [iterator, setIterator] = useState(null);
-  const query = useQuery().get('search')?.toLowerCase() || '';
+  const search = useQuery().get('search')?.toLowerCase() || '';
   const category = useQuery().get('category')?.toLowerCase() || '';
   const productsAmount = 35;
 
   useEffect(() => {
-    fetchProducts(category)
+    fetchProducts(category, search)
       .then((data) => {
         setProducts(data);
       })
@@ -31,7 +31,7 @@ export default function ProductsGrid() {
         console.error(err);
         setError(err.message);
       });
-  }, [category]);
+  }, [category, search]);
 
   const handleSortingChange = (e) => {
     setSorting(e.target.value);
@@ -43,16 +43,10 @@ export default function ProductsGrid() {
     return () => 0;
   };
 
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) =>
-      product.name.toLowerCase().includes(query)
-    );
-  }, [products, query]);
-
   const sortedProducts = useMemo(() => {
     const sortingFn = matchesSorting(sorting);
-    return [...filteredProducts].sort(sortingFn);
-  }, [filteredProducts, sorting]);
+    return [...products].sort(sortingFn);
+  }, [products, sorting]);
 
   useEffect(() => {
     const initIter = async () => {
