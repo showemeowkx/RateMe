@@ -9,6 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configValidationSchema } from 'src/config.schema';
 import { JwtStrategy } from './jwt.strategy';
 import { ModeratorGuard } from 'src/common/decorators/guards/moderator.guard';
+import { AuthProxy } from './auth.proxy';
 
 @Module({
   imports: [
@@ -30,7 +31,7 @@ import { ModeratorGuard } from 'src/common/decorators/guards/moderator.guard';
     TypeOrmModule.forFeature([User]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, ModeratorGuard],
-  exports: [JwtStrategy, PassportModule, AuthService, ModeratorGuard],
+  providers: [AuthService, AuthProxy, JwtStrategy, ModeratorGuard],
+  exports: [JwtStrategy, PassportModule, AuthProxy, ModeratorGuard],
 })
 export class AuthModule {}
