@@ -10,8 +10,8 @@ import { Review } from './review.entity';
 import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { User } from 'src/auth/user.entity';
-import { ItemsService } from 'src/items/items.service';
 import { AuthService } from 'src/auth/auth.service';
+import { ItemsProxy } from 'src/items/items.proxy';
 
 @Injectable()
 export class ReviewsService {
@@ -19,7 +19,7 @@ export class ReviewsService {
   constructor(
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
     private authService: AuthService,
-    private itemsService: ItemsService,
+    private itemsService: ItemsProxy,
   ) {}
 
   async getReviewsByItem(itemId: string): Promise<Review[]> {
