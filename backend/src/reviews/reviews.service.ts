@@ -10,15 +10,15 @@ import { Review } from './review.entity';
 import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { User } from 'src/auth/user.entity';
-import { AuthService } from 'src/auth/auth.service';
 import { ItemsProxy } from 'src/items/items.proxy';
+import { AuthProxy } from 'src/auth/auth.proxy';
 
 @Injectable()
 export class ReviewsService {
   private logger = new Logger('ReviewsService', { timestamp: true });
   constructor(
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
-    private authService: AuthService,
+    private authService: AuthProxy,
     private itemsService: ItemsProxy,
   ) {}
 
