@@ -5,29 +5,40 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { Response } from 'express';
-import { tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { mergeMap } from 'rxjs/operators';
 
-//TODO: Fix 'ERR_HTTP_HEADERS_SENT' error
 @Injectable()
 export class StreamifyInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler) {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const ctx = context.switchToHttp();
     const res = ctx.getResponse<Response>();
 
-    res.header('Content-Type', 'application/x-ndjson');
-    res.header('Transfer-Encoding', 'chunked');
+    res.setHeader('Content-Type', 'application/x-ndjson');
+    res.setHeader('Transfer-Encoding', 'chunked');
 
     return next.handle().pipe(
-      tap((data: any[]) => {
-        res.write('[');
-        data.forEach((item, index) => {
-          if (index > 0) {
-            res.write(',');
-          }
-          res.write(JSON.stringify(item) + '\n');
+      mergeMap((data: any[]) => {
+        return new Observable<void>((subscriber) => {
+          let index = 0;
+
+          const sendNext = () => {
+            if (index >= data.length) {
+              res.end();
+              subscriber.next();
+              subscriber.complete();
+              return;
+            }
+
+            const chunk = JSON.stringify(data[index]) + '\n';
+            res.write(chunk);
+            index++;
+
+            setImmediate(sendNext);
+          };
+
+          sendNext();
         });
-        res.write(']');
-        res.end();
       }),
     );
   }
