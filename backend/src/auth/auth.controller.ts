@@ -19,8 +19,9 @@ import { AuthGuard } from '@nestjs/passport';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { setStorageOptions } from 'src/common/file-upload';
-import { GetUser } from 'src/decorators/get-user.decorator';
+import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
+import { StreamifyInterceptor } from 'src/common/interceptors/streamify.interceptor';
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
 @Controller('auth')
@@ -30,6 +31,7 @@ export class AuthController {
 
   @Get()
   @UseGuards(AuthGuard())
+  @UseInterceptors(StreamifyInterceptor)
   getUsers(@Query() filterDto: GetUsersFilterDto): Promise<User[]> {
     this.logger.verbose(
       `Getting users... {filters" ${JSON.stringify(filterDto)}}`,
