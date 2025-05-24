@@ -5,6 +5,7 @@ import { Category } from './category.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NestjsFormDataModule } from 'nestjs-form-data';
 import { AuthModule } from 'src/auth/auth.module';
+import { CategoriesProxy } from './categories.proxy';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { AuthModule } from 'src/auth/auth.module';
     NestjsFormDataModule,
   ],
   controllers: [CategoriesController],
-  providers: [CategoriesService],
-  exports: [CategoriesService],
+  providers: [CategoriesService, CategoriesProxy],
+  exports: [CategoriesProxy],
 })
 export class CategoriesModule {}

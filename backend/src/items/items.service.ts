@@ -13,14 +13,14 @@ import { AddItemDto } from './dto/add-item.dto';
 import { User } from 'src/auth/user.entity';
 import * as fs from 'fs/promises';
 import { GetItemsFilterDto } from './dto/get-items-filter.dto';
-import { CategoriesService } from 'src/categories/categories.service';
+import { CategoriesProxy } from 'src/categories/categories.proxy';
 
 @Injectable()
 export class ItemsService {
   private logger = new Logger('ItemsService', { timestamp: true });
   constructor(
     @InjectRepository(Item) private itemsRepository: Repository<Item>,
-    private categoriesService: CategoriesService,
+    private categoriesService: CategoriesProxy,
   ) {}
 
   async getItems(filterDto: GetItemsFilterDto): Promise<Item[]> {
