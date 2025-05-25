@@ -14,6 +14,9 @@ import { User } from 'src/auth/user.entity';
 import * as fs from 'fs/promises';
 import { GetItemsFilterDto } from './dto/get-items-filter.dto';
 import { CategoriesProxy } from 'src/categories/categories.proxy';
+import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
+import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
+import { paginate } from 'src/common/pagination/pagination';
 
 @Injectable()
 export class ItemsService {
@@ -23,7 +26,10 @@ export class ItemsService {
     private categoriesService: CategoriesProxy,
   ) {}
 
-  async getItems(filterDto: GetItemsFilterDto): Promise<Item[]> {
+  async getItems(
+    filterDto: GetItemsFilterDto,
+    pagination: PaginationQueryDto,
+  ): Promise<PaginationDto<Item>> {
     const { category, name, minRating, maxRating } = filterDto;
 
     const query = this.itemsRepository.createQueryBuilder('item');
@@ -61,7 +67,7 @@ export class ItemsService {
     ]);
 
     try {
-      return await query.getMany();
+      return paginate(query, pagination.page, pagination.limit);
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to get items {filters: ${JSON.stringify(filterDto)}`,
