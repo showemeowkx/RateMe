@@ -13,14 +13,14 @@ import { AddItemDto } from './dto/add-item.dto';
 import { User } from 'src/auth/user.entity';
 import * as fs from 'fs/promises';
 import { GetItemsFilterDto } from './dto/get-items-filter.dto';
-import { CategoriesService } from 'src/categories/categories.service';
+import { CategoriesProxy } from 'src/categories/categories.proxy';
 
 @Injectable()
 export class ItemsService {
   private logger = new Logger('ItemsService', { timestamp: true });
   constructor(
     @InjectRepository(Item) private itemsRepository: Repository<Item>,
-    private categoriesService: CategoriesService,
+    private categoriesService: CategoriesProxy,
   ) {}
 
   async getItems(filterDto: GetItemsFilterDto): Promise<Item[]> {
@@ -93,13 +93,23 @@ export class ItemsService {
     file: Express.Multer.File,
   ): Promise<void> {
     const { categorySlug, name, description } = addItemDto;
+
+    const imagePath = file?.path;
+
+    if (!imagePath) {
+      this.logger.error(
+        `[FILE ERROR] Failed to create a category {slug: ${categorySlug}}`,
+      );
+      throw new InternalServerErrorException();
+    }
+
     const category = await this.categoriesService.getCategories({
       slug: categorySlug,
     });
 
     const item = this.itemsRepository.create({
       creator: user,
-      imagePath: file.path,
+      imagePath,
       category: category[0],
       name,
       description,
@@ -110,7 +120,7 @@ export class ItemsService {
     try {
       await this.itemsRepository.save(item);
     } catch (error) {
-      if (file?.path) await fs.unlink(file.path);
+      await fs.unlink(imagePath);
       if (error.code === '23505') {
         this.logger.error(
           `[ALREADY EXISTS] Failed to add an item {name: ${name}}`,

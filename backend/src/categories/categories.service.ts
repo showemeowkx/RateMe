@@ -50,7 +50,15 @@ export class CategoriesService {
     file: Express.Multer.File,
   ): Promise<void> {
     const { name, slug, color } = createCategoryDto;
-    const imagePath = file.path;
+
+    const imagePath = file?.path;
+
+    if (!imagePath) {
+      this.logger.error(
+        `[FILE ERROR] Failed to create a category {slug: ${slug}}`,
+      );
+      throw new InternalServerErrorException();
+    }
 
     const category = this.categoriesRepository.create({
       name,
@@ -62,7 +70,7 @@ export class CategoriesService {
     try {
       await this.categoriesRepository.save(category);
     } catch (error) {
-      if (file?.path) await fs.unlink(file.path);
+      await fs.unlink(imagePath);
       if (error.code === '23505') {
         this.logger.error(
           `[ALREADY EXISTS] Failed to create a category {slug: ${slug}}`,
