@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Param,
   Post,
   Query,
@@ -18,7 +19,9 @@ import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.d
 
 @Controller('reviews')
 export class ReviewsController {
-  constructor(private reviewsService: ReviewsProxy) {}
+  constructor(
+    @Inject('REVIEWS_SERVICE') private reviewsService: ReviewsProxy,
+  ) {}
 
   @Get('item/:itemId')
   getReviewsByItem(
