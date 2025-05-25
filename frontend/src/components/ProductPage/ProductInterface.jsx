@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { fetchProductById } from '../../services/api';
 import Loader from '../Loader';
 import styles from './ProductInterface.module.css';
+import ReviewList from './ReviewList';
 
 export default function ProductInterface() {
   const { id } = useParams();
@@ -40,41 +41,12 @@ export default function ProductInterface() {
           <p className={styles.text}>{product.description}</p>
         </div>
       </div>
-      <div className={styles.reviews}>
+      <div>
         {product.reviews.length ? (
           <div>
             <h1>Відгуки:</h1>
             <div className={styles.reviews}>
-              {product.reviews.map((review) => (
-                <div className={styles.review}>
-                  <div className={styles.user}>
-                    <img
-                      className={styles.userImg}
-                      src={`../${review.author.imagePath}`}
-                      alt='img'
-                    />
-                    <h2>{review.author.name}</h2>
-                    <h5>{review.author.username}</h5>
-                  </div>
-                  <div>
-                    <div className={styles.reviewsPoints}>
-                      <h3>Cподобалось:</h3>
-                      <p className={styles.reviewPar}>{review.liked}</p>
-                    </div>
-                    <div className={styles.reviewsPoints}>
-                      <h3>Не сподобалось:</h3>
-                      <p className={styles.reviewPar}>{review.disliked}</p>
-                    </div>
-                    <div className={styles.reviewsPoints}>
-                      <h3>Досвід використання:</h3>
-                      <p className={styles.reviewPar}>{review.usePeriod}</p>
-                    </div>
-                    <div>
-                      <p className={styles.reviewPar}>{review.text}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+              <ReviewList product={product} />
             </div>
           </div>
         ) : (
