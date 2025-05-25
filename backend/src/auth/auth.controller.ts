@@ -19,7 +19,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { setStorageOptions } from 'src/common/file-upload';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
-import { StreamifyInterceptor } from 'src/common/interceptors/streamify.interceptor';
 import { AuthProxy } from './auth.proxy';
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
@@ -29,7 +28,6 @@ export class AuthController {
 
   @Get()
   @UseGuards(AuthGuard())
-  @UseInterceptors(StreamifyInterceptor)
   getUsers(@Query() filterDto: GetUsersFilterDto): Promise<User[]> {
     return this.authService.getUsers(filterDto);
   }

@@ -17,8 +17,9 @@ import { setStorageOptions } from 'src/common/file-upload';
 import { Item } from './item.entity';
 import { GetItemsFilterDto } from './dto/get-items-filter.dto';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
-import { StreamifyInterceptor } from 'src/common/interceptors/streamify.interceptor';
 import { ItemsProxy } from './items.proxy';
+import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
+import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
@@ -27,9 +28,11 @@ export class ItemsController {
   constructor(private itemsService: ItemsProxy) {}
 
   @Get()
-  @UseInterceptors(StreamifyInterceptor)
-  getItems(@Query() filterDto: GetItemsFilterDto): Promise<Item[]> {
-    return this.itemsService.getItems(filterDto);
+  getItems(
+    @Query() filterDto: GetItemsFilterDto,
+    @Query() pagination: PaginationQueryDto,
+  ): Promise<PaginationDto<Item>> {
+    return this.itemsService.getItems(filterDto, pagination);
   }
 
   @Get('/:itemId')
