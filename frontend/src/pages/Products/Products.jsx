@@ -4,9 +4,17 @@ import ProductsGrid from '../../components/ProductsPage/ProductsGrid';
 
 export default function Products() {
   return (
-    <div>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+      }}
+    >
       <Header />
-      <ProductsGrid />
+      <main style={{ flex: 1 }}>
+        <ProductsGrid />
+      </main>
       <Footer />
     </div>
   );

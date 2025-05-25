@@ -4,6 +4,7 @@ import ProductsCard from './ProductsCard';
 import styles from './ProductsGrid.module.css';
 import { productGen } from '../../utilities/productsLoading';
 import { fetchProducts } from '../../services/api';
+import Loader from '../Loader';
 
 const ProductSortKind = {
   BEST: '★ Найкращі',
@@ -19,21 +20,31 @@ export default function ProductsGrid() {
   const [tempMaxRating, setTempMaxRating] = useState(100);
   const [products, setProducts] = useState([]);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [sorting, setSorting] = useState(ProductSortKind.BEST);
   const [visibleProducts, setVisibleProducts] = useState([]);
   const [iterator, setIterator] = useState(null);
+  const [showContent, setShowContent] = useState(false);
   const search = useQuery().get('search')?.toLowerCase() || '';
   const category = useQuery().get('category')?.toLowerCase() || '';
   const productsAmount = 35;
 
   useEffect(() => {
+    setLoading(true);
+    setShowContent(false);
     fetchProducts(category, search, minRating, maxRating)
       .then((data) => {
         setProducts(data);
+        setError(null);
       })
       .catch((err) => {
         console.error(err);
         setError(err.message);
+        setProducts([]);
+      })
+      .finally(() => {
+        setLoading(false);
+        setTimeout(() => setShowContent(true), 150);
       });
   }, [category, search, minRating, maxRating]);
 
@@ -122,26 +133,31 @@ export default function ProductsGrid() {
           </select>
         </div>
       </div>
-      {sortedProducts.length ? (
-        <div>
-          <div className={styles.productGrid}>
-            {visibleProducts.map((product) => (
-              <ProductsCard product={product} key={product.id} />
-            ))}
+
+      {loading ? (
+        <Loader />
+      ) : showContent ? (
+        sortedProducts.length > 0 ? (
+          <div>
+            <div className={styles.productGrid}>
+              {visibleProducts.map((product) => (
+                <ProductsCard product={product} key={product.id} />
+              ))}
+            </div>
+            {visibleProducts.length < sortedProducts.length && (
+              <button className={styles.loadMoreBtn} onClick={loadMore}>
+                Завантажити ще
+              </button>
+            )}
           </div>
-          {visibleProducts.length < sortedProducts.length && (
-            <button className={styles.loadMoreBtn} onClick={loadMore}>
-              Завантажити ще
-            </button>
-          )}
-        </div>
-      ) : (
-        <img
-          src='/assets/not_searchable.jpg'
-          alt='not_searchable'
-          className={styles.defaultImg}
-        />
-      )}
+        ) : (
+          <img
+            src='/assets/not_searchable.jpg'
+            alt='not_searchable'
+            className={styles.defaultImg}
+          />
+        )
+      ) : null}
     </div>
   );
 }
