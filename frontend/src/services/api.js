@@ -8,6 +8,7 @@ const fetchData = async (url) => {
 
 export const fetchCategories = () =>
   fetchData('http://localhost:3001/categories');
+
 export const fetchProducts = (
   category,
   search,
@@ -24,5 +25,18 @@ export const fetchProducts = (
   }
 
   const url = `http://localhost:3001/items?${params.toString()}`;
-  return fetchData(url);
+
+  return fetch(url)
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Failed to fetch from ${url}`);
+      }
+      return response.text();
+    })
+    .then((text) => {
+      return text
+        .split('\n')
+        .filter((line) => line.trim())
+        .map((line) => JSON.parse(line));
+    });
 };
