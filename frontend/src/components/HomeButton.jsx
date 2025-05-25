@@ -4,12 +4,10 @@ import { Link } from 'react-router-dom';
 
 export default function HomeButton() {
   return (
-    <div>
-      <Link to='/'>
-        <button className={styles.homeButton}>
-          <img className={styles.homeImg} src='../logo.png' alt='RateMe' />
-        </button>
-      </Link>
-    </div>
+    <Link to='/'>
+      <div className={styles.homeButton}>
+        <img className={styles.homeImg} src='../logo.png' alt='RateMe' />
+      </div>
+    </Link>
   );
 }

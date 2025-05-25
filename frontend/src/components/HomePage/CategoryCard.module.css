@@ -1,6 +1,5 @@
-.category {
-  align-items: center;
-  transition: transform 0.2s ease-in-out;
+.link {
+  text-decoration: none;
 }
 
 .categoryButton {
@@ -28,6 +27,7 @@
 
 .categoryTitle {
   font-size: 1.2rem;
-  font-family:Georgia, 'Times New Roman', Times, serif;
+  font-family: Georgia, 'Times New Roman', Times, serif;
   font-weight: bold;
+  color: #000;
 }
