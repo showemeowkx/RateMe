@@ -6,10 +6,13 @@ import { AddItemDto } from './dto/add-item.dto';
 import { User } from 'src/auth/user.entity';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
+import { ItemsServiceInterface } from './items-service.interfase';
+import * as NodeCache from 'node-cache';
 
 @Injectable()
-export class ItemsProxy {
+export class ItemsProxy implements ItemsServiceInterface {
   private logger = new Logger('ItemsProxy');
+  private cache = new NodeCache({ stdTTL: 600 });
 
   constructor(private itemsService: ItemsService) {}
 
@@ -17,15 +20,33 @@ export class ItemsProxy {
     filterDto: GetItemsFilterDto,
     pagination: PaginationQueryDto,
   ): Promise<PaginationDto<Item>> {
+    const cacheKey = JSON.stringify({ filterDto, pagination });
+    const cachedItems = this.cache.get<PaginationDto<Item>>(cacheKey);
+    if (cachedItems) {
+      this.logger.verbose(
+        `[CACHED] Getting items... {filters: ${JSON.stringify(filterDto)}}`,
+      );
+      return cachedItems;
+    }
     this.logger.verbose(
       `Getting items... {filters: ${JSON.stringify(filterDto)}}`,
     );
-    return this.itemsService.getItems(filterDto, pagination);
+    const items = await this.itemsService.getItems(filterDto, pagination);
+    this.cache.set(cacheKey, items);
+    return items;
   }
 
   async getItemById(itemId: string): Promise<Item> {
+    const cacheKey = `item-${itemId}`;
+    const cachedItem = this.cache.get<Item>(cacheKey);
+    if (cachedItem) {
+      this.logger.verbose(`[CACHED] Getting item by id... {itemId: ${itemId}}`);
+      return cachedItem;
+    }
     this.logger.verbose(`Getting item by id... {itemId: ${itemId}}`);
-    return this.itemsService.getItemById(itemId);
+    const item = await this.itemsService.getItemById(itemId);
+    this.cache.set(cacheKey, item);
+    return item;
   }
 
   async addItem(

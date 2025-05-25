@@ -16,7 +16,16 @@ import { ItemsProxy } from './items.proxy';
     NestjsFormDataModule,
   ],
   controllers: [ItemsController],
-  providers: [ItemsService, ItemsProxy],
-  exports: [ItemsProxy],
+  providers: [
+    ItemsService,
+    {
+      provide: 'ITEMS_SERVICE',
+      useFactory: (itemsService: ItemsService) => {
+        return new ItemsProxy(itemsService);
+      },
+      inject: [ItemsService],
+    },
+  ],
+  exports: ['ITEMS_SERVICE'],
 })
 export class ItemsModule {}

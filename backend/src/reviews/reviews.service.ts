@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   ConflictException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -10,11 +11,11 @@ import { Review } from './review.entity';
 import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { User } from 'src/auth/user.entity';
-import { ItemsProxy } from 'src/items/items.proxy';
 import { AuthProxy } from 'src/auth/auth.proxy';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 import { paginate } from 'src/common/pagination/pagination';
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
+import { ItemsServiceInterface } from 'src/items/items-service.interfase';
 
 @Injectable()
 export class ReviewsService {
@@ -22,7 +23,7 @@ export class ReviewsService {
   constructor(
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
     private authService: AuthProxy,
-    private itemsService: ItemsProxy,
+    @Inject('ITEMS_SERVICE') private itemsService: ItemsServiceInterface,
   ) {}
 
   async getReviewsByItem(

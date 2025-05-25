@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Param,
   Post,
   Query,
@@ -17,15 +18,17 @@ import { setStorageOptions } from 'src/common/file-upload';
 import { Item } from './item.entity';
 import { GetItemsFilterDto } from './dto/get-items-filter.dto';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
-import { ItemsProxy } from './items.proxy';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
+import { ItemsServiceInterface } from './items-service.interfase';
 
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
 @Controller('items')
 export class ItemsController {
-  constructor(private itemsService: ItemsProxy) {}
+  constructor(
+    @Inject('ITEMS_SERVICE') private itemsService: ItemsServiceInterface,
+  ) {}
 
   @Get()
   getItems(
