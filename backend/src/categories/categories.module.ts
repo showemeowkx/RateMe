@@ -18,8 +18,9 @@ import { CategoriesProxy } from './categories.proxy';
     CategoriesService,
     {
       provide: 'CATEGORIES_SERVICE',
-      useFactory: (categoriesService: CategoriesService) =>
-        new CategoriesProxy(categoriesService),
+      useFactory: (categoriesService: CategoriesService) => {
+        return new CategoriesProxy(categoriesService);
+      },
       inject: [CategoriesService],
     },
   ],
