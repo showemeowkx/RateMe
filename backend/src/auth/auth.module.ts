@@ -31,7 +31,18 @@ import { AuthProxy } from './auth.proxy';
     TypeOrmModule.forFeature([User]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, AuthProxy, JwtStrategy, ModeratorGuard],
-  exports: [JwtStrategy, PassportModule, AuthProxy, ModeratorGuard],
+  providers: [
+    AuthService,
+    {
+      provide: 'AUTH_SERVICE',
+      useFactory: (authService: AuthService) => {
+        return new AuthProxy(authService);
+      },
+      inject: [AuthService],
+    },
+    JwtStrategy,
+    ModeratorGuard,
+  ],
+  exports: [JwtStrategy, PassportModule, 'AUTH_SERVICE', ModeratorGuard],
 })
 export class AuthModule {}

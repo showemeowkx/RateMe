@@ -11,19 +11,19 @@ import { Review } from './review.entity';
 import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { User } from 'src/auth/user.entity';
-import { AuthProxy } from 'src/auth/auth.proxy';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 import { paginate } from 'src/common/pagination/pagination';
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { ItemsServiceInterface } from 'src/items/items-service.interfase';
 import { ReviewsServiceInterface } from './reviews-service.interface';
+import { AuthServiceInterface } from 'src/auth/auth-service.interface';
 
 @Injectable()
 export class ReviewsService implements ReviewsServiceInterface {
   private logger = new Logger('ReviewsService', { timestamp: true });
   constructor(
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
-    private authService: AuthProxy,
+    @Inject('AUTH_SERVICE') private authService: AuthServiceInterface,
     @Inject('ITEMS_SERVICE') private itemsService: ItemsServiceInterface,
   ) {}
 

@@ -1,13 +1,14 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 import { User } from './user.entity';
-import { AuthService } from './auth.service';
 import { AuthSignUpCredDto } from './dto/auth-sign-up.dto';
 import { AuthSignInCredDto } from './dto/auth-sign-in.dto';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
+import { AuthServiceInterface } from './auth-service.interface';
+import { AuthService } from './auth.service';
 
 @Injectable()
-export class AuthProxy {
+export class AuthProxy implements AuthServiceInterface {
   private logger = new Logger('AuthProxy');
   constructor(private authService: AuthService) {}
 

@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Param,
   Patch,
   Post,
@@ -19,12 +20,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { setStorageOptions } from 'src/common/file-upload';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
-import { AuthProxy } from './auth.proxy';
+import { AuthService } from './auth.service';
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthProxy) {}
+  constructor(@Inject('AUTH_SERVICE') private authService: AuthService) {}
 
   @Get()
   @UseGuards(AuthGuard())
