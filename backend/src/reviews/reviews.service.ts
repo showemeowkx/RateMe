@@ -16,9 +16,10 @@ import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.d
 import { paginate } from 'src/common/pagination/pagination';
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { ItemsServiceInterface } from 'src/items/items-service.interfase';
+import { ReviewsServiceInterface } from './reviews-service.interface';
 
 @Injectable()
-export class ReviewsService {
+export class ReviewsService implements ReviewsServiceInterface {
   private logger = new Logger('ReviewsService', { timestamp: true });
   constructor(
     @InjectRepository(Review) private reviewRepository: Repository<Review>,

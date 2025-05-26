@@ -17,9 +17,10 @@ import { CategoriesProxy } from 'src/categories/categories.proxy';
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 import { paginate } from 'src/common/pagination/pagination';
+import { ItemsServiceInterface } from './items-service.interfase';
 
 @Injectable()
-export class ItemsService {
+export class ItemsService implements ItemsServiceInterface {
   private logger = new Logger('ItemsService', { timestamp: true });
   constructor(
     @InjectRepository(Item) private itemsRepository: Repository<Item>,
