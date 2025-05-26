@@ -1,6 +1,14 @@
 import React from 'react';
 import styles from './ReviewList.module.css';
 
+const REVIEWS_PERIOD = {
+  some_hours: 'Кілька годин',
+  some_days: 'Кілька днів',
+  some_weeks: 'Кілька тижнів',
+  some_months: 'Кілька місяців',
+  some_years: 'Кілька років',
+};
+
 export default function ReviewList({ product }) {
   return (
     <>
@@ -26,7 +34,9 @@ export default function ReviewList({ product }) {
             </div>
             <div className={styles.reviewsPoints}>
               <h3>Досвід використання:</h3>
-              <p className={styles.reviewPar}>{review.usePeriod}</p>
+              <p className={styles.reviewPar}>
+                {REVIEWS_PERIOD[review.usePeriod]}
+              </p>
             </div>
             <div>
               <p className={styles.reviewPar}>{review.text}</p>
