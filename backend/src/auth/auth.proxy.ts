@@ -6,17 +6,30 @@ import { AuthSignInCredDto } from './dto/auth-sign-in.dto';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
 import { AuthServiceInterface } from './auth-service.interface';
 import { AuthService } from './auth.service';
+import * as NodeCache from 'node-cache';
 
 @Injectable()
 export class AuthProxy implements AuthServiceInterface {
   private logger = new Logger('AuthProxy');
+  private cache = new NodeCache({ stdTTL: 600 });
+
   constructor(private authService: AuthService) {}
 
   async getUsers(filterDto: GetUsersFilterDto): Promise<User[]> {
+    const cacheKey = JSON.stringify(filterDto);
+    const cachedUsers = this.cache.get<User[]>(cacheKey);
+    if (cachedUsers) {
+      this.logger.verbose(
+        `[CACHED] Getting users with... {filters: ${JSON.stringify(filterDto)}}`,
+      );
+      return cachedUsers;
+    }
     this.logger.verbose(
       `Getting users with... {filters: ${JSON.stringify(filterDto)}}`,
     );
-    return this.authService.getUsers(filterDto);
+    const users = await this.authService.getUsers(filterDto);
+    this.cache.set(cacheKey, users);
+    return users;
   }
 
   async getUserById(userId: string): Promise<User> {
