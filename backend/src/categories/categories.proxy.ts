@@ -3,9 +3,10 @@ import { CategoriesService } from './categories.service';
 import { Category } from './category.entity';
 import { GetCategoriesFilterDto } from './dto/get-categories-filter.dto';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { CategoriesServiceIInterface } from './categories-service.interface';
 
 @Injectable()
-export class CategoriesProxy {
+export class CategoriesProxy implements CategoriesServiceIInterface {
   private logger = new Logger('CategoriesProxy');
 
   constructor(private categoriesService: CategoriesService) {}

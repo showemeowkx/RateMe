@@ -13,7 +13,7 @@ import * as fs from 'fs/promises';
 import { GetCategoriesFilterDto } from './dto/get-categories-filter.dto';
 
 @Injectable()
-export class CategoriesService {
+export class CategoriesService implements CategoriesService {
   private logger = new Logger('CategoriesService', { timestamp: true });
   constructor(
     @InjectRepository(Category)
