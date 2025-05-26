@@ -1,3 +1,5 @@
+const URL = 'http://localhost:3001';
+
 const fetchData = async (url) => {
   const response = await fetch(url);
   if (!response.ok) {
@@ -6,10 +8,9 @@ const fetchData = async (url) => {
   return response.json();
 };
 
-export const fetchCategories = () =>
-  fetchData('http://localhost:3001/categories');
+export const fetchCategories = () => fetchData(`${URL}/categories`);
 
-export const fetchProducts = (
+export const fetchProducts = async (
   category,
   search,
   minRating = 0,
@@ -24,19 +25,22 @@ export const fetchProducts = (
     params.append('maxRating', maxRating);
   }
 
-  const url = `http://localhost:3001/items?${params.toString()}`;
+  const itemsUrl = `${URL}/items?${params.toString()}`;
 
-  return fetch(url)
-    .then((response) => {
-      if (!response.ok) {
-        throw new Error(`Failed to fetch from ${url}`);
-      }
-      return response.text();
-    })
-    .then((text) => {
-      return text
-        .split('\n')
-        .filter((line) => line.trim())
-        .map((line) => JSON.parse(line));
-    });
+  const response = await fetch(itemsUrl);
+
+  if (!response.ok) {
+    throw new Error(`Failed to fetch from ${itemsUrl}`);
+  }
+
+  const text = await response.text();
+
+  return text
+    .split('\n')
+    .filter((line) => line.trim())
+    .map((line) => JSON.parse(line));
+};
+
+export const fetchProductById = (productId) => {
+  return fetchData(`${URL}/items/${productId}`);
 };
