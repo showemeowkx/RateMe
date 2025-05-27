@@ -136,13 +136,21 @@ export class AuthService {
 
   async updatePfp(user: User, file: Express.Multer.File): Promise<void> {
     const oldImagePath = user.imagePath;
-    const newImagePath = file.path;
+    const newImagePath = file?.path;
+
+    if (!newImagePath) {
+      this.logger.error(
+        `[FILE ERROR] Failed to update a profile picture {username: ${user.username}}`,
+      );
+      throw new InternalServerErrorException();
+    }
+
     try {
       await this.userRepository.update(user.id, { imagePath: newImagePath });
       if (oldImagePath !== 'uploads/defaults/user_default.jpg')
         await fs.unlink(oldImagePath);
     } catch (error) {
-      if (file?.path) await fs.unlink(file.path);
+      await fs.unlink(newImagePath);
       this.logger.error(
         `[INTERNAL] Failed to update a profile picture... {username: ${user.username}}`,
         error.stack,

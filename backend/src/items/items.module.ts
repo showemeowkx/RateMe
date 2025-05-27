@@ -6,6 +6,7 @@ import { Item } from './item.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { NestjsFormDataModule } from 'nestjs-form-data';
 import { CategoriesModule } from 'src/categories/categories.module';
+import { ItemsProxy } from './items.proxy';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { CategoriesModule } from 'src/categories/categories.module';
     NestjsFormDataModule,
   ],
   controllers: [ItemsController],
-  providers: [ItemsService],
-  exports: [ItemsService],
+  providers: [ItemsService, ItemsProxy],
+  exports: [ItemsProxy],
 })
 export class ItemsModule {}

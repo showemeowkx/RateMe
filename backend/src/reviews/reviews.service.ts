@@ -10,26 +10,34 @@ import { Review } from './review.entity';
 import { Repository } from 'typeorm';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { User } from 'src/auth/user.entity';
-import { ItemsService } from 'src/items/items.service';
-import { AuthService } from 'src/auth/auth.service';
+import { ItemsProxy } from 'src/items/items.proxy';
+import { AuthProxy } from 'src/auth/auth.proxy';
+import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
+import { paginate } from 'src/common/pagination/pagination';
+import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 
 @Injectable()
 export class ReviewsService {
   private logger = new Logger('ReviewsService', { timestamp: true });
   constructor(
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
-    private authService: AuthService,
-    private itemsService: ItemsService,
+    private authService: AuthProxy,
+    private itemsService: ItemsProxy,
   ) {}
 
-  async getReviewsByItem(itemId: string): Promise<Review[]> {
+  async getReviewsByItem(
+    itemId: string,
+    pagination: PaginationQueryDto,
+  ): Promise<PaginationDto<Review>> {
     await this.itemsService.getItemById(itemId);
 
     try {
-      const reviews = await this.reviewRepository.find({
-        where: { item: { id: itemId } },
-      });
-      return reviews;
+      const query = this.reviewRepository
+        .createQueryBuilder('review')
+        .leftJoinAndSelect('review.author', 'author')
+        .where('review.item.id = :itemId', { itemId });
+
+      return paginate(query, pagination.page, pagination.limit);
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to get reviews for item {itemId: ${itemId}}`,
@@ -39,15 +47,19 @@ export class ReviewsService {
     }
   }
 
-  async getReviewsByUser(userId: string): Promise<Review[]> {
+  async getReviewsByUser(
+    userId: string,
+    pagination: PaginationQueryDto,
+  ): Promise<PaginationDto<Review>> {
     await this.authService.getUserById(userId);
 
     try {
-      const reviews = await this.reviewRepository.find({
-        where: { author: { id: userId } },
-        relations: ['item'],
-      });
-      return reviews;
+      const query = this.reviewRepository
+        .createQueryBuilder('review')
+        .leftJoinAndSelect('review.item', 'item')
+        .where('review.author.id = :userId', { userId });
+
+      return paginate(query, pagination.page, pagination.limit);
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to get reviews for user {userId: ${userId}}`,
@@ -62,7 +74,8 @@ export class ReviewsService {
     user: User,
     itemId: string,
   ): Promise<void> {
-    const reviews = await this.getReviewsByUser(user.id);
+    const pagination: PaginationQueryDto = { page: 1, limit: Infinity };
+    const reviews = (await this.getReviewsByUser(user.id, pagination)).items;
     const sameReview = reviews.find((review) => review.item.id === itemId);
 
     if (sameReview) {
