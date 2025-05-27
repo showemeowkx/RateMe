@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchProductById } from '../../services/api';
+import { fetchProductById } from '../../services/products/productsFetch';
 import Loader from '../Loader';
 import styles from './ProductInterface.module.css';
 import ReviewList from './ReviewList';
