@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Post,
   Query,
   UploadedFile,
@@ -14,13 +15,16 @@ import { setStorageOptions } from 'src/common/file-upload';
 import { Category } from './category.entity';
 import { GetCategoriesFilterDto } from './dto/get-categories-filter.dto';
 import { ModeratorGuard } from 'src/common/decorators/guards/moderator.guard';
-import { CategoriesProxy } from './categories.proxy';
+import { CategoriesServiceIInterface } from './categories-service.interface';
 
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
 @Controller('categories')
 export class CategoriesController {
-  constructor(private categoriesService: CategoriesProxy) {}
+  constructor(
+    @Inject('CATEGORIES_SERVICE')
+    private categoriesService: CategoriesServiceIInterface,
+  ) {}
 
   @Get()
   getCategories(

@@ -19,9 +19,10 @@ import { JwtPayload } from './jwt-payload.interface';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 import * as fs from 'fs/promises';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
+import { AuthServiceInterface } from './auth-service.interface';
 
 @Injectable()
-export class AuthService {
+export class AuthService implements AuthServiceInterface {
   private logger = new Logger('AuthService', { timestamp: true });
   constructor(
     @InjectRepository(User)

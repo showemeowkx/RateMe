@@ -14,7 +14,16 @@ import { CategoriesProxy } from './categories.proxy';
     NestjsFormDataModule,
   ],
   controllers: [CategoriesController],
-  providers: [CategoriesService, CategoriesProxy],
-  exports: [CategoriesProxy],
+  providers: [
+    CategoriesService,
+    {
+      provide: 'CATEGORIES_SERVICE',
+      useFactory: (categoriesService: CategoriesService) => {
+        return new CategoriesProxy(categoriesService);
+      },
+      inject: [CategoriesService],
+    },
+  ],
+  exports: ['CATEGORIES_SERVICE'],
 })
 export class CategoriesModule {}

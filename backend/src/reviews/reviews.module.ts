@@ -10,6 +10,15 @@ import { ReviewsProxy } from './reviews.proxy';
 @Module({
   imports: [TypeOrmModule.forFeature([Review]), AuthModule, ItemsModule],
   controllers: [ReviewsController],
-  providers: [ReviewsService, ReviewsProxy],
+  providers: [
+    ReviewsService,
+    {
+      provide: 'REVIEWS_SERVICE',
+      useFactory: (reviewsService: ReviewsService) => {
+        return new ReviewsProxy(reviewsService);
+      },
+      inject: [ReviewsService],
+    },
+  ],
 })
 export class ReviewsModule {}

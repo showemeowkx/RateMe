@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Inject,
   Param,
   Post,
   Query,
@@ -12,13 +13,15 @@ import { CreateReviewDto } from './dto/create-review.dto';
 import { User } from 'src/auth/user.entity';
 import { Review } from './review.entity';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
-import { ReviewsProxy } from './reviews.proxy';
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
+import { ReviewsServiceInterface } from './reviews-service.interface';
 
 @Controller('reviews')
 export class ReviewsController {
-  constructor(private reviewsService: ReviewsProxy) {}
+  constructor(
+    @Inject('REVIEWS_SERVICE') private reviewsService: ReviewsServiceInterface,
+  ) {}
 
   @Get('item/:itemId')
   getReviewsByItem(

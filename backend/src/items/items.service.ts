@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   ConflictException,
+  Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
@@ -13,17 +14,19 @@ import { AddItemDto } from './dto/add-item.dto';
 import { User } from 'src/auth/user.entity';
 import * as fs from 'fs/promises';
 import { GetItemsFilterDto } from './dto/get-items-filter.dto';
-import { CategoriesProxy } from 'src/categories/categories.proxy';
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 import { paginate } from 'src/common/pagination/pagination';
+import { ItemsServiceInterface } from './items-service.interfase';
+import { CategoriesServiceIInterface } from 'src/categories/categories-service.interface';
 
 @Injectable()
-export class ItemsService {
+export class ItemsService implements ItemsServiceInterface {
   private logger = new Logger('ItemsService', { timestamp: true });
   constructor(
     @InjectRepository(Item) private itemsRepository: Repository<Item>,
-    private categoriesService: CategoriesProxy,
+    @Inject('CATEGORIES_SERVICE')
+    private categoriesService: CategoriesServiceIInterface,
   ) {}
 
   async getItems(
