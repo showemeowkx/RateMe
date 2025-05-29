@@ -5,7 +5,7 @@ import Loader from '../Loader';
 import styles from './ProductsGrid.module.css';
 import { fetchProducts } from '../../services/products/productsFetch';
 import { productGen } from '../../utilities/productsLoading';
-
+import { asyncDecorator } from '../../utilities/asyncDecorator';
 const SORT_OPTIONS = {
   BEST: '★ Найкращі',
   WORST: '☆ Найгірші',
@@ -57,25 +57,27 @@ export default function ProductsGrid() {
     setTempMaxRating(initialMaxRating);
   }, [initialMinRating, initialMaxRating]);
 
-  useEffect(() => {
-    setLoading(true);
-    setShowContent(false);
+  const fetchProductsWithStatus = useMemo(
+    () =>
+      asyncDecorator(fetchProducts, {
+        onStart: () => {
+          setLoading(true);
+          setError(null);
+          setShowContent(false);
+        },
+        onSuccess: (data) => setProducts(data),
+        onError: (err) => setError(err.message),
+        onFinish: () => {
+          setLoading(false);
+          setTimeout(() => setShowContent(true), 150);
+        },
+      }),
+    [setLoading, setError, setProducts, setShowContent]
+  );
 
-    fetchProducts(category, search, minRating, maxRating)
-      .then((data) => {
-        setProducts(data);
-        setError(null);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError(err.message);
-        setProducts([]);
-      })
-      .finally(() => {
-        setLoading(false);
-        setTimeout(() => setShowContent(true), 150);
-      });
-  }, [category, search, minRating, maxRating]);
+  useEffect(() => {
+    fetchProductsWithStatus(category, search, minRating, maxRating);
+  }, [category, search, minRating, maxRating, fetchProductsWithStatus]);
 
   const sortedProducts = useMemo(() => {
     const sortFn =
