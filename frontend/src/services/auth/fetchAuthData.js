@@ -1,7 +1,6 @@
-import { fetchData } from '../api';
 import Cookies from 'js-cookie';
 
-export const fetchAuthData = (url, options = { method: 'GET' }) => {
+export const fetchAuthData = (fn, url, options = { method: 'GET' }) => {
   const token = Cookies.get('token');
   let newOptions = options;
   if (token) {
@@ -10,5 +9,5 @@ export const fetchAuthData = (url, options = { method: 'GET' }) => {
       Headers: { ...options.headers, Authorization: `Bearer ${token}` },
     };
   }
-  return fetchData(url, newOptions);
+  return fn(url, newOptions);
 };

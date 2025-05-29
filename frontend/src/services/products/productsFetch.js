@@ -6,10 +6,14 @@ export const fetchProducts = async (
   category,
   search,
   minRating = 0,
-  maxRating = 100
+  maxRating = 100,
+  page,
+  limit = 35
 ) => {
   const params = new URLSearchParams();
 
+  if (page) params.append('page', page);
+  if (limit) params.append('limit', limit);
   if (category) params.append('category', category);
   if (search) params.append('name', search);
   if (!(minRating === 0 && maxRating === 100)) {
@@ -25,12 +29,9 @@ export const fetchProducts = async (
     throw new Error(`Failed to fetch from ${itemsUrl}`);
   }
 
-  const text = await response.text();
+  const data = await response.json();
 
-  return text
-    .split('\n')
-    .filter((line) => line.trim())
-    .map((line) => JSON.parse(line));
+  return data.items || []; // fallback to empty array
 };
 
 export const fetchProductById = (productId) => {
@@ -38,7 +39,7 @@ export const fetchProductById = (productId) => {
 };
 
 export const addProduct = (dto) => {
-  return fetchAuthData(`${URL}/items`, {
+  return fetchAuthData(fetchData, `${URL}/items`, {
     method: 'POST',
     body: dtoConvert(dto),
   });
