@@ -8,6 +8,7 @@ import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.d
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { ItemsServiceInterface } from './items-service.interfase';
 import * as NodeCache from 'node-cache';
+import { SortItemsDto } from './dto/sort-items.dto';
 
 @Injectable()
 export class ItemsProxy implements ItemsServiceInterface {
@@ -19,19 +20,24 @@ export class ItemsProxy implements ItemsServiceInterface {
   async getItems(
     filterDto: GetItemsFilterDto,
     pagination: PaginationQueryDto,
+    sortingDto: SortItemsDto,
   ): Promise<PaginationDto<Item>> {
-    const cacheKey = JSON.stringify({ filterDto, pagination });
+    const cacheKey = JSON.stringify({ filterDto });
     const cachedItems = this.cache.get<PaginationDto<Item>>(cacheKey);
     if (cachedItems) {
       this.logger.verbose(
-        `[CACHED] Getting items... {filters: ${JSON.stringify(filterDto)}}`,
+        `[CACHED] Getting items... {query: ${JSON.stringify(filterDto)}}`,
       );
       return cachedItems;
     }
     this.logger.verbose(
-      `Getting items... {filters: ${JSON.stringify(filterDto)}}`,
+      `Getting items... {query: ${JSON.stringify(filterDto)}}`,
     );
-    const items = await this.itemsService.getItems(filterDto, pagination);
+    const items = await this.itemsService.getItems(
+      filterDto,
+      pagination,
+      sortingDto,
+    );
     this.cache.set(cacheKey, items);
     return items;
   }

@@ -19,6 +19,7 @@ import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.d
 import { paginate } from 'src/common/pagination/pagination';
 import { ItemsServiceInterface } from './items-service.interfase';
 import { CategoriesServiceIInterface } from 'src/categories/categories-service.interface';
+import { SortItemsDto } from './dto/sort-items.dto';
 
 @Injectable()
 export class ItemsService implements ItemsServiceInterface {
@@ -32,6 +33,7 @@ export class ItemsService implements ItemsServiceInterface {
   async getItems(
     filterDto: GetItemsFilterDto,
     pagination: PaginationQueryDto,
+    sortingDto: SortItemsDto,
   ): Promise<PaginationDto<Item>> {
     const { category, name, minRating, maxRating } = filterDto;
 
@@ -60,14 +62,29 @@ export class ItemsService implements ItemsServiceInterface {
       query.andWhere('item.rating <= :maxRating', { maxRating });
     }
 
-    query.leftJoinAndSelect('item.category', 'category');
-    query.select([
-      'item.id',
-      'item.imagePath',
-      'item.name',
-      'item.rating',
-      'category',
-    ]);
+    query
+      .leftJoinAndSelect('item.category', 'category')
+      .select([
+        'item.id',
+        'item.imagePath',
+        'item.name',
+        'item.rating',
+        'category',
+      ]);
+
+    if (sortingDto.sorting) {
+      try {
+        query.orderBy('item.rating', sortingDto.sorting);
+      } catch (error) {
+        this.logger.error(
+          `[WRONG INPUT] Failed to sort items {sorting: ${sortingDto.sorting}}`,
+          error.stack,
+        );
+        throw new ConflictException(
+          `Unnable to apply '${sortingDto.sorting}' sorting method`,
+        );
+      }
+    }
 
     try {
       return paginate(query, pagination.page, pagination.limit);
