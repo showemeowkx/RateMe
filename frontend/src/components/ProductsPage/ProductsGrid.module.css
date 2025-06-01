@@ -160,3 +160,33 @@
   background-color: #cc6666;
   color: #fafafa
 }
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.page {
+  background-color: #bababa;
+  color: #000;
+  font-weight: bold;
+  border: 2px solid #2a2a2a;
+  border-radius: 15px;
+  width: 40px;
+  height: 40px;
+  font-size: 16px;
+  box-shadow: #000;
+}
+
+.page:hover {
+  transform: scale(0.98);
+  box-shadow: 0 5px 5px 0 rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.page:active {
+  transform: none;
+  background-color: #cccccc;
+}
