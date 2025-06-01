@@ -1,6 +1,6 @@
 import { dtoConvert } from '../../utilities/dtoToFormData';
-import { URL, fetchData } from '../api';
-import { fetchAuthData } from '../auth/fetchAuthData';
+import { URL } from '../api';
+import { fetchAuthData as fetchData } from '../auth/fetchAuthData';
 
 export const fetchProducts = async (
   category,
@@ -31,7 +31,7 @@ export const fetchProducts = async (
 
   const data = await response.json();
 
-  return data.items || []; // fallback to empty array
+  return data.items || [];
 };
 
 export const fetchProductById = (productId) => {
@@ -39,7 +39,7 @@ export const fetchProductById = (productId) => {
 };
 
 export const addProduct = (dto) => {
-  return fetchAuthData(fetchData, `${URL}/items`, {
+  return fetchData(`${URL}/items`, {
     method: 'POST',
     body: dtoConvert(dto),
   });

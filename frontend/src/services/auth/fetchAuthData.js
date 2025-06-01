@@ -1,13 +1,18 @@
 import Cookies from 'js-cookie';
+import { fetchData } from '../api';
 
-export const fetchAuthData = (fn, url, options = { method: 'GET' }) => {
-  const token = Cookies.get('token');
-  let newOptions = options;
-  if (token) {
-    newOptions = {
-      ...options,
-      Headers: { ...options.headers, Authorization: `Bearer ${token}` },
-    };
-  }
-  return fn(url, newOptions);
-};
+const getFetchAuthData =
+  (fn) =>
+  (url, options = { method: 'GET' }) => {
+    const token = Cookies.get('token');
+    let newOptions = options;
+    if (token) {
+      newOptions = {
+        ...options,
+        headers: { ...options.headers, Authorization: `Bearer ${token}` },
+      };
+    }
+    return fn(url, newOptions);
+  };
+
+export const fetchAuthData = getFetchAuthData(fetchData);
