@@ -1,7 +1,3 @@
-.link {
-  text-decoration: none;
-}
-
 .addButton {
   position: relative;
   display: flex;
@@ -9,7 +5,7 @@
   justify-content: center;
   max-width: 400px;
   gap: 8px;
-  height: 35px;
+  height: 52px;
   padding: 8px 16px 8px 30px;
   font-size: 18px;
   border: 1px solid #aaaaaa;
@@ -44,7 +40,7 @@
 @media (min-width: 576px) and (max-width: 800px) {
   .addButton {
     font-size: 14px;
-    height: 21px;
+    height: 38px;
   }
 
   .addIcon {
@@ -54,13 +50,14 @@
 
 @media (max-width: 576px) {
   .addButton {
-    width: 37px;
-    height: 37px;
-    padding: 0px;
+    width: 38px;
+    height: 38px;
+    padding: 0px 10px;
   }
 
   .addIcon {
     position: static;
     transform: translateY(0%);
+    font-size: 17px;
   }
 }

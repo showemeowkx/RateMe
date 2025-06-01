@@ -2,6 +2,8 @@ import './App.css';
 import Home from './pages/Home/Home';
 import Products from './pages/Products/Products';
 import Product from './pages/Product/Product';
+import Registration from './pages/Registration/Registration';
+import Login from './pages/Login/Login';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -12,6 +14,8 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/products' element={<Products />} />
           <Route path='/products/:id' element={<Product />} />
+          <Route path='/sign-up' element={<Registration />} />
+          <Route path='/sign-in' element={<Login />} />
         </Routes>
       </Router>
     </div>
