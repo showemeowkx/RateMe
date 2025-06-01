@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import styles from './AddProduct.module.css';
-import { Link } from 'react-router-dom';
 import { FaPlusSquare } from 'react-icons/fa';
+import Cookies from 'js-cookie';
+import { useNavigate } from 'react-router-dom';
 
 export default function AddProduct() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 576);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
@@ -15,12 +17,16 @@ export default function AddProduct() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  const handleNavigation = () => {
+    const token = Cookies.get('token');
+    const navigation = token ? '/add-product' : '/sign-up';
+    navigate(navigation);
+  };
+
   return (
-    <Link className={styles.link} to='/add-product'>
-      <div className={styles.addButton}>
-        <FaPlusSquare className={styles.addIcon} />
-        {!isMobile && <>&nbsp; Створити товар</>}
-      </div>
-    </Link>
+    <button className={styles.addButton} onClick={handleNavigation}>
+      <FaPlusSquare className={styles.addIcon} />
+      {!isMobile && <>&nbsp; Створити товар</>}
+    </button>
   );
 }
