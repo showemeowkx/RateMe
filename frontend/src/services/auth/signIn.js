@@ -4,9 +4,16 @@ import Cookies from 'js-cookie';
 
 export const signIn = async (dto) => {
   try {
+    const params = new URLSearchParams();
+    params.append('login', dto.login);
+    params.append('password', dto.password);
+
     const response = await fetchData(`${URL}/auth/signin`, {
       method: 'POST',
-      body: JSON.stringify(dto),
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: params.toString(),
     });
     const token = response.accessToken;
     Cookies.set('token', token);
