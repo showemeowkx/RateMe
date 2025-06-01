@@ -5,16 +5,16 @@ export class CreateReviewDto {
   @IsEnum(UsePeriod)
   usePeriod: UsePeriod;
 
-  @MaxLength(300)
+  @MaxLength(700)
   @IsString()
   liked?: string;
 
-  @MaxLength(300)
+  @MaxLength(700)
   @IsString()
   disliked?: string;
 
   @MinLength(20)
-  @MaxLength(1000)
+  @MaxLength(1500)
   @IsString()
   text: string;
 }

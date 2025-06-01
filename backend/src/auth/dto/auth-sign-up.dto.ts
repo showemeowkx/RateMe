@@ -12,9 +12,8 @@ export class AuthSignUpCredDto {
   @MinLength(2)
   @MaxLength(15)
   @IsNotEmpty()
-  @Matches(/^[A-Z][a-z]+(?:[ -][A-Z][a-z]+)*$/, {
-    message:
-      'Name must start with a capital letter and contain only letters, spaces, and hyphens!',
+  @Matches(/^[A-ZА-ЯІЇЄҐ][a-zа-яіїєґ']+(?:[ -][A-ZА-ЯІЇЄҐ][a-zа-яіїєґ']+)*$/, {
+    message: 'Name must start with a capital letter and contain only letters!',
   })
   name: string;
 
@@ -22,9 +21,9 @@ export class AuthSignUpCredDto {
   @MinLength(2)
   @MaxLength(20)
   @IsNotEmpty()
-  @Matches(/^[A-Z][a-z]+(?:[ -][A-Z][a-z]+)*$/, {
+  @Matches(/^[A-ZА-ЯІЇЄҐ][a-zа-яіїєґ']+(?:[ -][A-ZА-ЯІЇЄҐ][a-zа-яіїєґ']+)*$/, {
     message:
-      'Surname must start with a capital letter and contain only letters, spaces, and hyphens!',
+      'Surname must start with a capital letter and contain only letters!',
   })
   surname: string;
 
