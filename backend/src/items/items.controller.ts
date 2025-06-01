@@ -21,6 +21,7 @@ import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { ItemsServiceInterface } from './items-service.interfase';
+import { SortItemsDto } from './dto/sort-items.dto';
 
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
@@ -34,8 +35,9 @@ export class ItemsController {
   getItems(
     @Query() filterDto: GetItemsFilterDto,
     @Query() pagination: PaginationQueryDto,
+    @Query() sortingDto: SortItemsDto,
   ): Promise<PaginationDto<Item>> {
-    return this.itemsService.getItems(filterDto, pagination);
+    return this.itemsService.getItems(filterDto, pagination, sortingDto);
   }
 
   @Get('/:itemId')

@@ -76,7 +76,10 @@ export class ReviewsService implements ReviewsServiceInterface {
     user: User,
     itemId: string,
   ): Promise<void> {
-    const pagination: PaginationQueryDto = { page: 1, limit: Infinity };
+    const pagination: PaginationQueryDto = {
+      page: 1,
+      limit: Number.MAX_SAFE_INTEGER,
+    };
     const reviews = (await this.getReviewsByUser(user.id, pagination)).items;
     const sameReview = reviews.find((review) => review.item.id === itemId);
 
