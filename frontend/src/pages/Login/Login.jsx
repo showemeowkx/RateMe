@@ -28,7 +28,7 @@ export default function Login() {
       await signIn(logForm);
       navigate('/');
     } catch (err) {
-      setError(err.message || 'Error during signing in');
+      setError(err.message);
     }
   };
 
@@ -39,8 +39,6 @@ export default function Login() {
     if (name === 'password') setShowPassword((previous) => !previous);
   };
 
-  if (error) return <div className={styles.error}>Error: {error}</div>;
-
   return (
     <div>
       <div className={styles.homeButton}>
@@ -49,6 +47,7 @@ export default function Login() {
       <div className={styles.login}>
         <div>
           <h1>Введіть дані для входу</h1>
+          {error && <h5 className={styles.error}>{error}</h5>}
           <form className={styles.form} method='post' onSubmit={handleSignIn}>
             <div>
               <label>Юзернейм</label>

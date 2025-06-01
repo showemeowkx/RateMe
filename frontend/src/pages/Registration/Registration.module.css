@@ -132,3 +132,9 @@
 .authPrompt button {
   margin-top: 40px;
 }
+
+.error {
+  color: #780000;
+  font-style: bold;
+  text-align: center;
+}

@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import styles from './Registration.module.css';
 import { signUp } from '../../services/auth/signUp';
-import { signIn } from '../../services/auth/signIn';
 import registerDto from '../../services/auth/dto/registerDto';
-import loginDto from '../../services/auth/dto/loginDto';
 import { useNavigate } from 'react-router-dom';
 import HomeButton from '../../components/HomeButton';
 
@@ -17,7 +15,7 @@ export default function Registration() {
   const [checkPassword, setCheckPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showCheckPassword, setShowCheckPassword] = useState(false);
-
+  const [error, setError] = useState([]);
   const navigate = useNavigate();
 
   const handleInputChanging = (e) => {
@@ -31,16 +29,22 @@ export default function Registration() {
     if (name === 'checkPassword') setCheckPassword(value);
   };
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
-    const regForm = new registerDto(name, surname, username, email, password);
-    signUp(regForm);
-  };
+    try {
+      const registerForm = new registerDto(
+        name,
+        surname,
+        username,
+        email,
+        password
+      );
 
-  const handleSignIn = (e) => {
-    e.preventDefault();
-    const logForm = new loginDto(username, password);
-    signIn(logForm);
+      await signUp(registerForm);
+      navigate('/');
+    } catch (err) {
+      setError(err.messages);
+    }
   };
 
   const isFormValid =
@@ -58,6 +62,7 @@ export default function Registration() {
     if (name === 'checkPassword') setShowCheckPassword((previous) => !previous);
   };
 
+  if (error.length) console.log(error);
   return (
     <div>
       <div className={styles.homeButton}>
@@ -66,7 +71,16 @@ export default function Registration() {
       <div className={styles.registration}>
         <div>
           <h1>Введіть дані для реєстрації</h1>
-          <form className={styles.form} method='post'>
+          {error.length ? (
+            error.map((err, index) => (
+              <h5 key={index} className={styles.error}>
+                {err}
+              </h5>
+            ))
+          ) : (
+            <></>
+          )}
+          <form className={styles.form} method='post' onSubmit={handleSignUp}>
             <div>
               <label>Ім'я</label>
               <input
