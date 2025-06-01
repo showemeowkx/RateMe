@@ -32,9 +32,6 @@ export class Item {
   @Column('double precision')
   rating: number;
 
-  @Column()
-  link: string;
-
   @OneToMany(() => Review, (review) => review.item)
   reviews: Review[];
 }

@@ -140,7 +140,6 @@ export class ItemsService implements ItemsServiceInterface {
       name,
       description,
       rating: 0,
-      link: 'NO_LINK_PROVIDED',
     });
 
     try {
