@@ -62,7 +62,6 @@ export default function Registration() {
     if (name === 'checkPassword') setShowCheckPassword((previous) => !previous);
   };
 
-  if (error.length) console.log(error);
   return (
     <div>
       <div className={styles.homeButton}>
