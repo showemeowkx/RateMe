@@ -7,8 +7,9 @@ export const fetchProducts = async (
   search,
   minRating = 0,
   maxRating = 100,
-  page,
-  limit = 35
+  limit,
+  sorting,
+  page
 ) => {
   const params = new URLSearchParams();
 
@@ -16,6 +17,8 @@ export const fetchProducts = async (
   if (limit) params.append('limit', limit);
   if (category) params.append('category', category);
   if (search) params.append('name', search);
+  if (sorting) params.append('sorting', sorting);
+
   if (!(minRating === 0 && maxRating === 100)) {
     params.append('minRating', minRating);
     params.append('maxRating', maxRating);
@@ -31,7 +34,7 @@ export const fetchProducts = async (
 
   const data = await response.json();
 
-  return data.items || [];
+  return data || [];
 };
 
 export const fetchProductById = (productId) => {
