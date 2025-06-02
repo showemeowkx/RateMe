@@ -4,11 +4,16 @@ import ProductsCard from './ProductsCard';
 import Loader from '../Loader';
 import styles from './ProductsGrid.module.css';
 import { fetchProducts } from '../../services/products/productsFetch';
-import { productGen } from '../../utilities/productsLoading';
 import { asyncDecorator } from '../../utilities/asyncDecorator';
+
 const SORT_OPTIONS = {
   BEST: '★ Найкращі',
   WORST: '☆ Найгірші',
+};
+
+const SORTING_REQUEST = {
+  [SORT_OPTIONS.BEST]: 'DESC',
+  [SORT_OPTIONS.WORST]: 'ASC',
 };
 
 const useQueryParams = () => {
@@ -16,18 +21,15 @@ const useQueryParams = () => {
   return {
     search: query.get('search')?.toLowerCase() || '',
     category: query.get('category')?.toLowerCase() || '',
-    minRating: query.get('minRating'),
-    maxRating: query.get('maxRating'),
+    minRatingQuery: query.get('minRating'),
+    maxRatingQuery: query.get('maxRating'),
+    page: Number(query.get('page')) || 1,
   };
 };
 
 export default function ProductsGrid() {
-  const {
-    search,
-    category,
-    minRating: minRatingQuery,
-    maxRating: maxRatingQuery,
-  } = useQueryParams();
+  const { search, category, minRatingQuery, maxRatingQuery, page } =
+    useQueryParams();
   const navigate = useNavigate();
 
   const initialMinRating = minRatingQuery !== null ? Number(minRatingQuery) : 0;
@@ -35,8 +37,7 @@ export default function ProductsGrid() {
     maxRatingQuery !== null ? Number(maxRatingQuery) : 100;
 
   const [products, setProducts] = useState([]);
-  const [visibleProducts, setVisibleProducts] = useState([]);
-  const [iterator, setIterator] = useState(null);
+  const [totalPages, setTotalPages] = useState(null);
 
   const [minRating, setMinRating] = useState(initialMinRating);
   const [maxRating, setMaxRating] = useState(initialMaxRating);
@@ -48,6 +49,7 @@ export default function ProductsGrid() {
   const [error, setError] = useState(null);
   const [showContent, setShowContent] = useState(false);
 
+  const sortingValue = SORTING_REQUEST[sorting];
   const PRODUCTS_BATCH = 35;
 
   useEffect(() => {
@@ -65,45 +67,47 @@ export default function ProductsGrid() {
           setError(null);
           setShowContent(false);
         },
-        onSuccess: (data) => setProducts(data),
+        onSuccess: (data) => {
+          setProducts(data.items);
+          setTotalPages(Math.ceil(data.total / data.limit));
+        },
         onError: (err) => setError(err.message),
         onFinish: () => {
           setLoading(false);
           setTimeout(() => setShowContent(true), 150);
         },
       }),
-    [setLoading, setError, setProducts, setShowContent]
+    []
   );
 
   useEffect(() => {
-    fetchProductsWithStatus(category, search, minRating, maxRating);
-  }, [category, search, minRating, maxRating, fetchProductsWithStatus]);
-
-  const sortedProducts = useMemo(() => {
-    const sortFn =
-      sorting === SORT_OPTIONS.BEST
-        ? (a, b) => b.rating - a.rating
-        : (a, b) => a.rating - b.rating;
-    return [...products].sort(sortFn);
-  }, [products, sorting]);
+    fetchProductsWithStatus(
+      category,
+      search,
+      minRating,
+      maxRating,
+      PRODUCTS_BATCH,
+      sortingValue,
+      page
+    );
+  }, [
+    category,
+    search,
+    minRating,
+    maxRating,
+    fetchProductsWithStatus,
+    PRODUCTS_BATCH,
+    sortingValue,
+    page,
+  ]);
 
   useEffect(() => {
-    const initIter = async () => {
-      const gen = productGen(sortedProducts, PRODUCTS_BATCH);
-      setIterator(gen);
-      const { value } = await gen.next();
-      setVisibleProducts(value || []);
-    };
-    initIter();
-  }, [sortedProducts]);
-
-  const loadMore = async () => {
-    if (!iterator) return;
-    const { value, done } = await iterator.next();
-    if (!done && value) {
-      setVisibleProducts((current) => [...current, ...value]);
+    if (page !== 1) {
+      const params = new URLSearchParams(window.location.search);
+      params.set('page', '1');
+      navigate({ search: params.toString() }, { replace: true });
     }
-  };
+  }, [category, search, minRating, maxRating, sorting, navigate]);
 
   const handleRatingApply = () => {
     setMinRating(tempMinRating);
@@ -118,6 +122,12 @@ export default function ProductsGrid() {
 
   const isApplyDisabled =
     tempMinRating > tempMaxRating || tempMinRating < 0 || tempMaxRating > 100;
+
+  const goToPage = (page) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set('page', page);
+    navigate({ search: params.toString() });
+  };
 
   if (error) return <div className={styles.error}>Error: {error}</div>;
 
@@ -169,17 +179,32 @@ export default function ProductsGrid() {
       {loading ? (
         <Loader />
       ) : showContent ? (
-        sortedProducts.length > 0 ? (
+        products.length ? (
           <div>
             <div className={styles.productGrid}>
-              {visibleProducts.map((product) => (
+              {products.map((product) => (
                 <ProductsCard product={product} key={product.id} />
               ))}
             </div>
-            {visibleProducts.length < sortedProducts.length && (
-              <button className={styles.loadMoreBtn} onClick={loadMore}>
-                Завантажити ще
-              </button>
+            {totalPages > 1 && (
+              <div className={styles.pagination}>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (pageNumber) => (
+                    <button
+                      key={pageNumber}
+                      onClick={() => goToPage(pageNumber)}
+                      className={styles.page}
+                      style={
+                        pageNumber === page
+                          ? { backgroundColor: '#7ed5ad' }
+                          : {}
+                      }
+                    >
+                      {pageNumber}
+                    </button>
+                  )
+                )}
+              </div>
             )}
           </div>
         ) : (
