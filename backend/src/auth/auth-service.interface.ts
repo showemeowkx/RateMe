@@ -9,6 +9,8 @@ export interface AuthServiceInterface {
 
   getUserById(userId: string): Promise<User>;
 
+  getProfileInfo(user: User): Promise<User>;
+
   createUser(authSignUpCredDto: AuthSignUpCredDto): Promise<void>;
 
   signIn(

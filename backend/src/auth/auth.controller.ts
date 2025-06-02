@@ -33,10 +33,16 @@ export class AuthController {
     return this.authService.getUsers(filterDto);
   }
 
-  @Get('/:userId')
+  @Get('id/:userId')
   @UseGuards(AuthGuard())
   getUserById(@Param('userId') userId: string): Promise<User> {
     return this.authService.getUserById(userId);
+  }
+
+  @Get('/profile')
+  @UseGuards(AuthGuard())
+  async getMyInfo(@GetUser() user: User): Promise<User> {
+    return this.authService.getProfileInfo(user);
   }
 
   @Post('/signup')
