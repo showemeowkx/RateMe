@@ -57,7 +57,7 @@ export class ItemsController {
     @Body() addItemDto: AddItemDto,
     @GetUser() user: User,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<void> {
+  ): Promise<{ itemId: string }> {
     return this.itemsService.addItem(addItemDto, user, file);
   }
 }

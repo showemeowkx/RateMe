@@ -84,6 +84,18 @@ export class AuthService implements AuthServiceInterface {
     return user;
   }
 
+  async getProfileInfo(user: User): Promise<User> {
+    try {
+      return this.getUserById(user.id);
+    } catch (error) {
+      this.logger.error(
+        `[INTERNAL] Failed to get profile info... {username: ${user.username}}`,
+        error,
+      );
+      throw new InternalServerErrorException();
+    }
+  }
+
   async createUser(authSignInCredDto: AuthSignUpCredDto): Promise<void> {
     const { name, surname, username, email, password } = authSignInCredDto;
 

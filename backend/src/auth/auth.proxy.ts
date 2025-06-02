@@ -37,6 +37,11 @@ export class AuthProxy implements AuthServiceInterface {
     return this.authService.getUserById(userId);
   }
 
+  async getProfileInfo(user: User): Promise<User> {
+    this.logger.verbose(`Getting profile info... {username: ${user.username}}`);
+    return this.authService.getProfileInfo(user);
+  }
+
   async createUser(authSignUpCredDto: AuthSignUpCredDto): Promise<void> {
     this.logger.verbose(
       `Creating a user... {username: ${authSignUpCredDto.username}}`,

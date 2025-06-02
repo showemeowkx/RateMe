@@ -19,5 +19,5 @@ export interface ItemsServiceInterface {
     addItemDto: AddItemDto,
     user: User,
     file: Express.Multer.File,
-  ): Promise<void>;
+  ): Promise<{ itemId: string }>;
 }

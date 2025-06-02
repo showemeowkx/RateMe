@@ -117,7 +117,7 @@ export class ItemsService implements ItemsServiceInterface {
     addItemDto: AddItemDto,
     user: User,
     file: Express.Multer.File,
-  ): Promise<void> {
+  ): Promise<{ itemId: string }> {
     const { categorySlug, name, description } = addItemDto;
 
     const imagePath = file?.path;
@@ -133,6 +133,14 @@ export class ItemsService implements ItemsServiceInterface {
       slug: categorySlug,
     });
 
+    if (category.length < 1) {
+      await fs.unlink(imagePath);
+      this.logger.error(`[WRONG INPUT] Failed to add an item {name: ${name}}`);
+      throw new ConflictException(
+        `A category with slug '${categorySlug}' doesn't exist`,
+      );
+    }
+
     const item = this.itemsRepository.create({
       creator: user,
       imagePath,
@@ -144,6 +152,7 @@ export class ItemsService implements ItemsServiceInterface {
 
     try {
       await this.itemsRepository.save(item);
+      return { itemId: item.id };
     } catch (error) {
       await fs.unlink(imagePath);
       if (error.code === '23505') {
