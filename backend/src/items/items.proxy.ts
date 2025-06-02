@@ -59,7 +59,7 @@ export class ItemsProxy implements ItemsServiceInterface {
     addItemDto: AddItemDto,
     user: User,
     file: Express.Multer.File,
-  ): Promise<void> {
+  ): Promise<{ itemId: string }> {
     this.logger.verbose(`Adding item... {name: ${addItemDto.name}}`);
     return this.itemsService.addItem(addItemDto, user, file);
   }

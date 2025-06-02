@@ -117,7 +117,7 @@ export class ItemsService implements ItemsServiceInterface {
     addItemDto: AddItemDto,
     user: User,
     file: Express.Multer.File,
-  ): Promise<void> {
+  ): Promise<{ itemId: string }> {
     const { categorySlug, name, description } = addItemDto;
 
     const imagePath = file?.path;
@@ -144,6 +144,7 @@ export class ItemsService implements ItemsServiceInterface {
 
     try {
       await this.itemsRepository.save(item);
+      return { itemId: item.id };
     } catch (error) {
       await fs.unlink(imagePath);
       if (error.code === '23505') {
