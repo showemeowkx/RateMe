@@ -133,6 +133,14 @@ export class ItemsService implements ItemsServiceInterface {
       slug: categorySlug,
     });
 
+    if (category.length < 1) {
+      await fs.unlink(imagePath);
+      this.logger.error(`[WRONG INPUT] Failed to add an item {name: ${name}}`);
+      throw new ConflictException(
+        `A category with slug '${categorySlug}' doesn't exist`,
+      );
+    }
+
     const item = this.itemsRepository.create({
       creator: user,
       imagePath,
