@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import styles from './AddProduct.module.css';
+import styles from './AddProductButton.module.css';
 import { FaPlusSquare } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';

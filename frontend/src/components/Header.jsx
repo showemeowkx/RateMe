@@ -1,17 +1,17 @@
 import React from 'react';
 import styles from './Header.module.css';
 import HomeButton from './HomeButton';
-import AddProduct from './AddProduct';
+import AddProductButton from './AddProductButton';
 import SearchBar from './SearchBar';
-import Profile from './Profile';
+import ProfileButton from './ProfileButton';
 
 export default function Header() {
   return (
     <div className={styles.header}>
       <HomeButton />
       <SearchBar />
-      <AddProduct />
-      <Profile />
+      <AddProductButton />
+      <ProfileButton />
     </div>
   );
 }
