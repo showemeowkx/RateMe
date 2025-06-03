@@ -1,4 +1,4 @@
-class AddProductDto {
+export default class AddProductDto {
   constructor(name, description, file, categorySlug) {
     this.name = name;
     this.description = description;
