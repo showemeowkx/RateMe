@@ -143,7 +143,7 @@ export class ItemsService implements ItemsServiceInterface {
 
     const item = this.itemsRepository.create({
       creator: user,
-      imagePath,
+      imagePath: imagePath.replace(/\\/g, '/'),
       category: category[0],
       name,
       description,

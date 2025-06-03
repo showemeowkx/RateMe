@@ -64,7 +64,7 @@ export class CategoriesService implements CategoriesService {
       name,
       slug,
       color,
-      imagePath,
+      imagePath: imagePath.replace(/\\/g, '/'),
     });
 
     try {

@@ -159,7 +159,9 @@ export class AuthService implements AuthServiceInterface {
     }
 
     try {
-      await this.userRepository.update(user.id, { imagePath: newImagePath });
+      await this.userRepository.update(user.id, {
+        imagePath: newImagePath.replace(/\\/g, '/'),
+      });
       if (oldImagePath !== 'uploads/defaults/user_default.jpg')
         await fs.unlink(oldImagePath);
     } catch (error) {
