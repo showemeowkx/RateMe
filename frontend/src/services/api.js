@@ -1,15 +1,23 @@
-export const URL = 'http://localhost:3002';
+export const URL = 'http://localhost:3001';
 
-export const fetchData = async (url, options = { method: 'GET' }) => {
+export const fetchData = async (
+  url,
+  options = { method: 'GET' },
+  result = true
+) => {
   const response = await fetch(url, options);
-  console.log(response);
-  const data = await response.json();
 
   if (!response.ok) {
+    const data = await response.json();
     const message = data.message || `Error: ${response.status}`;
-    const error = new Error(message);
+
+    const error = new Error('Validation error');
     error.status = response.status;
+    error.message = message;
     throw error;
   }
-  return data;
+
+  if (result) {
+    return await response.json();
+  }
 };

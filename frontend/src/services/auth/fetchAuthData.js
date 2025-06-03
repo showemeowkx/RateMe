@@ -3,7 +3,7 @@ import { fetchData } from '../api';
 
 const getFetchAuthData =
   (fn) =>
-  (url, options = { method: 'GET' }) => {
+  (url, options = { method: 'GET' }, result = true) => {
     const token = Cookies.get('token');
     let newOptions = options;
     if (token) {
@@ -12,7 +12,7 @@ const getFetchAuthData =
         headers: { ...options.headers, Authorization: `Bearer ${token}` },
       };
     }
-    return fn(url, newOptions);
+    return fn(url, newOptions, result);
   };
 
 export const fetchAuthData = getFetchAuthData(fetchData);
