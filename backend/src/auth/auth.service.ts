@@ -20,7 +20,7 @@ import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 import * as fs from 'fs/promises';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
 import { AuthServiceInterface } from './auth-service.interface';
-import { getPrimaryPath } from 'src/common/file-upload';
+import { getPrimaryPath, getRealPath } from 'src/common/file-upload';
 
 @Injectable()
 export class AuthService implements AuthServiceInterface {
@@ -163,8 +163,10 @@ export class AuthService implements AuthServiceInterface {
       await this.userRepository.update(user.id, {
         imagePath: getPrimaryPath(newImagePath),
       });
-      if (oldImagePath !== 'uploads/defaults/user_default.jpg')
-        await fs.unlink(oldImagePath);
+      if (oldImagePath !== 'uploads/defaults/user_default.jpg') {
+        const realOldImagePath = getRealPath(oldImagePath);
+        await fs.unlink(realOldImagePath);
+      }
     } catch (error) {
       await fs.unlink(newImagePath);
       this.logger.error(

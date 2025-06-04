@@ -25,6 +25,14 @@ export const getPrimaryPath = (uploadPath: string): string => {
   return relativePath.replace(/\\/g, '/');
 };
 
+export const getRealPath = (primaryPath: string): string => {
+  const additionalPath =
+    process.env.NODE_ENV === 'development' ? '../frontend/public' : '';
+  const realPath = path.join(additionalPath, primaryPath);
+
+  return realPath.replace(/\\/g, '/');
+};
+
 const initDir = (dir: string) => {
   return (
     req,
