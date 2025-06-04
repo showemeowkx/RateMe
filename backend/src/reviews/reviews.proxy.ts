@@ -62,6 +62,7 @@ export class ReviewsProxy implements ReviewsServiceInterface {
     user: User,
     itemId: string,
   ): Promise<void> {
+    this.cache.flushAll();
     this.logger.verbose(
       `Creating a review... {user: ${user.username}, itemId: ${itemId}}`,
     );

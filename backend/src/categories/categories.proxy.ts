@@ -34,6 +34,7 @@ export class CategoriesProxy implements CategoriesServiceIInterface {
     createCategoryDto: CreateCategoryDto,
     file: Express.Multer.File,
   ): Promise<void> {
+    this.cache.flushAll();
     this.logger.verbose(
       `Creating a new category... {slug: ${createCategoryDto.slug}}`,
     );

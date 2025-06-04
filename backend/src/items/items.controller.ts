@@ -7,6 +7,7 @@ import {
   Post,
   Query,
   UploadedFile,
+  UseFilters,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -22,6 +23,7 @@ import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.d
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { ItemsServiceInterface } from './items-service.interfase';
 import { SortItemsDto } from './dto/sort-items.dto';
+import { ValidationExceptionFilter } from 'src/common/validation-exception-filter';
 
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
@@ -47,6 +49,7 @@ export class ItemsController {
 
   @Post()
   @UseGuards(AuthGuard())
+  @UseFilters(ValidationExceptionFilter)
   @UseInterceptors(
     FileInterceptor(
       'file',

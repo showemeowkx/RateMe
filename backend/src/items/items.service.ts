@@ -20,6 +20,7 @@ import { paginate } from 'src/common/pagination/pagination';
 import { ItemsServiceInterface } from './items-service.interfase';
 import { CategoriesServiceIInterface } from 'src/categories/categories-service.interface';
 import { SortItemsDto } from './dto/sort-items.dto';
+import { getPrimaryPath } from 'src/common/file-upload';
 
 @Injectable()
 export class ItemsService implements ItemsServiceInterface {
@@ -143,7 +144,7 @@ export class ItemsService implements ItemsServiceInterface {
 
     const item = this.itemsRepository.create({
       creator: user,
-      imagePath,
+      imagePath: getPrimaryPath(imagePath),
       category: category[0],
       name,
       description,

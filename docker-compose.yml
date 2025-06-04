@@ -23,11 +23,11 @@ services:
       dockerfile: Dockerfile
     container_name: nest-backend
     ports:
-      - "${BACK_PORT}:${BACK_PORT}"
+      - "${BACK_PORT_PROD}:${BACK_PORT_PROD}"
     environment:
       - NODE_ENV=${NODE_ENV}
-      - DATABASE_URL=postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_DATABASE}
-      - PORT=${BACK_PORT}
+      - DATABASE_URL=postgres://${DB_USERNAME}:${DB_PASSWORD}@${DB_HOST_PROD}:${DB_PORT}/${DB_DATABASE}
+      - PORT=${BACK_PORT_PROD}
     env_file:
       - ./.env
     depends_on:

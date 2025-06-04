@@ -25,7 +25,10 @@ import { CategoriesModule } from './categories/categories.module';
           type: 'postgres',
           autoLoadEntities: true,
           synchronize: true,
-          host: configService.get('DB_HOST'),
+          host:
+            configService.get('NODE_ENV') === 'production'
+              ? configService.get('DB_HOST_PROD')
+              : configService.get('DB_HOST_DEV'),
           port: configService.get('DB_PORT'),
           username: configService.get('DB_USERNAME'),
           password: configService.get('DB_PASSWORD'),
