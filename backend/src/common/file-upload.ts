@@ -15,13 +15,25 @@ export const setStorageOptions = (dir: string, allowedExtensions: string[]) => {
   };
 };
 
+export const getPrimaryPath = (uploadPath: string): string => {
+  const pathDirs = uploadPath.replace(/\\/g, '/').split('/').splice(-3);
+  const relativePath = pathDirs.reduce(
+    (finalPath, dir) => path.join(finalPath, dir),
+    '',
+  );
+
+  return relativePath.replace(/\\/g, '/');
+};
+
 const initDir = (dir: string) => {
   return (
     req,
     file: Express.Multer.File,
     cb: (error: Error | null, filename: string) => void,
   ) => {
-    const uploadPath: string = path.join('uploads', dir);
+    const additionalPath =
+      process.env.NODE_ENV === 'development' ? '../frontend/public' : '';
+    const uploadPath: string = path.join(additionalPath, 'uploads', dir);
     fs.mkdirSync(uploadPath, { recursive: true });
 
     cb(null, uploadPath);

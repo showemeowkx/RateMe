@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import * as fs from 'fs/promises';
 import { GetCategoriesFilterDto } from './dto/get-categories-filter.dto';
+import { getPrimaryPath } from 'src/common/file-upload';
 
 @Injectable()
 export class CategoriesService implements CategoriesService {
@@ -64,7 +65,7 @@ export class CategoriesService implements CategoriesService {
       name,
       slug,
       color,
-      imagePath: imagePath.replace(/\\/g, '/'),
+      imagePath: getPrimaryPath(imagePath),
     });
 
     try {
