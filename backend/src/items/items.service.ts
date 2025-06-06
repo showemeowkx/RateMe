@@ -137,7 +137,7 @@ export class ItemsService implements ItemsServiceInterface {
     if (category.length < 1) {
       await fs.unlink(imagePath);
       this.logger.error(`[WRONG INPUT] Failed to add an item {name: ${name}}`);
-      throw new ConflictException(
+      throw new NotFoundException(
         `A category with slug '${categorySlug}' doesn't exist`,
       );
     }
@@ -174,8 +174,7 @@ export class ItemsService implements ItemsServiceInterface {
     const item = await this.getItemById(itemId);
     try {
       const imagePath = getRealPath(item.imagePath);
-      await fs.unlink(imagePath);
-      await this.itemsRepository.remove(item);
+      await this.itemsRepository.remove(item).then(() => fs.unlink(imagePath));
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to delete an item {itemId: ${item.id}`,
