@@ -18,6 +18,6 @@ export class Category {
   @Column()
   color: string;
 
-  @OneToMany(() => Item, (item) => item.category)
+  @OneToMany(() => Item, (item) => item.category, { onDelete: 'CASCADE' })
   items: Item[];
 }
