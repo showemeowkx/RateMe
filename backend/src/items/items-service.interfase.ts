@@ -20,4 +20,6 @@ export interface ItemsServiceInterface {
     user: User,
     file: Express.Multer.File,
   ): Promise<{ itemId: string }>;
+
+  deleteItem(itemId: string): Promise<void>;
 }
