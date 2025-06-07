@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -24,6 +25,7 @@ import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { ItemsServiceInterface } from './items-service.interfase';
 import { SortItemsDto } from './dto/sort-items.dto';
 import { ValidationExceptionFilter } from 'src/common/validation-exception-filter';
+import { ModeratorGuard } from 'src/common/decorators/guards/moderator.guard';
 
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
@@ -62,5 +64,11 @@ export class ItemsController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ itemId: string }> {
     return this.itemsService.addItem(addItemDto, user, file);
+  }
+
+  @Delete('/:itemId')
+  @UseGuards(ModeratorGuard)
+  deleteItem(@Param('itemId') itemId: string): Promise<void> {
+    return this.itemsService.deleteItem(itemId);
   }
 }

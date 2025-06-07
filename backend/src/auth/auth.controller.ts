@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -21,6 +22,7 @@ import { setStorageOptions } from 'src/common/file-upload';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
 import { AuthService } from './auth.service';
+import { ModeratorGuard } from 'src/common/decorators/guards/moderator.guard';
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
 @Controller('auth')
@@ -85,5 +87,17 @@ export class AuthController {
     @Body() updateCredentialsDto: UpdateCredentialsDto,
   ): Promise<{ accessToken: string }> {
     return this.authService.updateCredentials(user, updateCredentialsDto);
+  }
+
+  @Delete('id/:userId')
+  @UseGuards(ModeratorGuard)
+  deleteUser(@Param('userId') userId: string): Promise<void> {
+    return this.authService.deleteUser(userId);
+  }
+
+  @Delete('/profile')
+  @UseGuards(AuthGuard())
+  deleteAccount(@GetUser() user: User): Promise<void> {
+    return this.authService.deleteUser(user);
   }
 }

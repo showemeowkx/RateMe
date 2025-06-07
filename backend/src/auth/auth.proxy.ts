@@ -79,4 +79,11 @@ export class AuthProxy implements AuthServiceInterface {
     this.logger.verbose(`Updating credentials... {username: ${user.username}}`);
     return this.authService.updateCredentials(user, updateCredentialsDto);
   }
+
+  async deleteUser(toDelete: string | User): Promise<void> {
+    const userId = typeof toDelete === 'string' ? toDelete : toDelete.id;
+    this.cache.flushAll();
+    this.logger.verbose(`Deleting a user... {userId: ${userId}}`);
+    return this.authService.deleteUser(toDelete);
+  }
 }

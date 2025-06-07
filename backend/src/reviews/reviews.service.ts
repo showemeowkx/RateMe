@@ -5,6 +5,7 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Review } from './review.entity';
@@ -96,8 +97,8 @@ export class ReviewsService implements ReviewsServiceInterface {
 
     const { usePeriod, liked, disliked, text } = createReviewDto;
 
-    const likedChecked = liked ? liked : 'Не визначено';
-    const dislikedChecked = disliked ? disliked : 'Не визначено';
+    const likedChecked = liked ? liked : 'Not defined';
+    const dislikedChecked = disliked ? disliked : 'Not defined';
 
     const review = this.reviewRepository.create({
       item: item,
@@ -114,6 +115,29 @@ export class ReviewsService implements ReviewsServiceInterface {
       this.logger.error(
         `[INTERNAL] Failed to create a review {item: ${item.name}, user: ${user.username}}`,
 
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async deleteReview(reviewId: string): Promise<void> {
+    const review = await this.reviewRepository.findOneBy({ id: reviewId });
+
+    if (!review) {
+      this.logger.error(
+        `[NOT FOUND] Failed to delete a review {reviewId: ${reviewId}}`,
+      );
+      throw new NotFoundException(
+        `A review with id '${reviewId}' doesn't exist`,
+      );
+    }
+
+    try {
+      await this.reviewRepository.remove(review);
+    } catch (error) {
+      this.logger.error(
+        `[INTERNAL] Failed to delete a review {reviewId: ${reviewId}}`,
         error.stack,
       );
       throw new InternalServerErrorException();

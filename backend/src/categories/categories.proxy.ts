@@ -40,4 +40,10 @@ export class CategoriesProxy implements CategoriesServiceIInterface {
     );
     return this.categoriesService.createCategory(createCategoryDto, file);
   }
+
+  async deleteCategory(slug: string): Promise<void> {
+    this.cache.flushAll();
+    this.logger.verbose(`Deleting a category... {slug: ${slug}}`);
+    return this.categoriesService.deleteCategory(slug);
+  }
 }

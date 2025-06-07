@@ -25,4 +25,6 @@ export interface AuthServiceInterface {
     user: User,
     updateCredentialsDto: UpdateCredentialsDto,
   ): Promise<{ accessToken: string }>;
+
+  deleteUser(toDelete: string | User): Promise<void>;
 }

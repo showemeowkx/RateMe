@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
@@ -16,6 +17,7 @@ import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
 import { ReviewsServiceInterface } from './reviews-service.interface';
+import { ModeratorGuard } from 'src/common/decorators/guards/moderator.guard';
 
 @Controller('reviews')
 export class ReviewsController {
@@ -48,5 +50,11 @@ export class ReviewsController {
     @Param('itemId') itemId: string,
   ): Promise<void> {
     return this.reviewsService.createReview(createReviewDto, user, itemId);
+  }
+
+  @Delete('review/:reviewId')
+  @UseGuards(ModeratorGuard)
+  deleteReview(@Param('reviewId') reviewId: string): Promise<void> {
+    return this.reviewsService.deleteReview(reviewId);
   }
 }

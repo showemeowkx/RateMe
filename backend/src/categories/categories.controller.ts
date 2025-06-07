@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
+  Param,
   Post,
   Query,
   UploadedFile,
@@ -46,5 +48,11 @@ export class CategoriesController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<void> {
     return this.categoriesService.createCategory(createCategoryDto, file);
+  }
+
+  @Delete('/:slug')
+  @UseGuards(ModeratorGuard)
+  deleteCategory(@Param('slug') slug: string): Promise<void> {
+    return this.categoriesService.deleteCategory(slug);
   }
 }

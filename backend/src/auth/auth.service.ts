@@ -123,7 +123,6 @@ export class AuthService implements AuthServiceInterface {
       } else {
         this.logger.error(
           `[INTERNAL] Failed to create a user {username: ${username}}`,
-
           error.stack,
         );
         throw new InternalServerErrorException();
@@ -183,7 +182,7 @@ export class AuthService implements AuthServiceInterface {
       await this.userRepository.update(user.id, { isModerator: true });
     } catch (error) {
       this.logger.error(
-        `[INTERNAL] Failed to set moderator status... {username: ${user.username}}`,
+        `[INTERNAL] Failed to set moderator status {username: ${user.username}}`,
         error.stack,
       );
       throw new InternalServerErrorException();
@@ -203,7 +202,7 @@ export class AuthService implements AuthServiceInterface {
       if (username === user.username) {
         throw new ConflictException(
           this.logger.error(
-            `[SAME INPUT] Failed to update credentials... {username: ${user.username}}`,
+            `[SAME INPUT] Failed to update credentials {username: ${user.username}}`,
           ),
           'New username must be different from current one',
         );
@@ -213,7 +212,7 @@ export class AuthService implements AuthServiceInterface {
       for (const sameUser of sameUsers) {
         if (sameUser.username === username) {
           this.logger.error(
-            `[ALREADY EXISTS] Failed to update credentials... {username: ${user.username}}`,
+            `[ALREADY EXISTS] Failed to update credentials {username: ${user.username}}`,
           );
           throw new ConflictException('This username is already taken');
         }
@@ -228,7 +227,7 @@ export class AuthService implements AuthServiceInterface {
       loginValue = user.username;
     } else {
       this.logger.error(
-        `[WRONG INPUT] Failed to update credentials... {username: ${user.username}}`,
+        `[WRONG INPUT] Failed to update credentials {username: ${user.username}}`,
       );
       throw new BadRequestException('No credentials to update');
     }
@@ -246,7 +245,37 @@ export class AuthService implements AuthServiceInterface {
       return { accessToken };
     } catch (error) {
       this.logger.error(
-        `[INTERNAL] Failed to update credentials... {username: ${user.username}}`,
+        `[INTERNAL] Failed to update credentials {username: ${user.username}}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async deleteUser(toDelete: string | User): Promise<void> {
+    const userId = typeof toDelete === 'string' ? toDelete : toDelete.id;
+    const user =
+      typeof toDelete === 'string' ? await this.getUserById(userId) : toDelete;
+    try {
+      const imagePath = getRealPath(user.imagePath);
+      const itemsImagePaths = user['items'].map((item) =>
+        getRealPath(item.imagePath),
+      );
+      await this.userRepository
+        .remove(user)
+        .then(async () => {
+          if (user.imagePath !== 'uploads/defaults/user_default.jpg') {
+            await fs.unlink(imagePath);
+          }
+        })
+        .then(async () => {
+          for (const imagePath of itemsImagePaths) {
+            await fs.unlink(imagePath);
+          }
+        });
+    } catch (error) {
+      this.logger.error(
+        `[INTERNAL] Failed to delete a user {userId: ${userId}}`,
         error.stack,
       );
       throw new InternalServerErrorException();
