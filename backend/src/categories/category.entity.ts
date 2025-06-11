@@ -18,6 +18,9 @@ export class Category {
   @Column()
   color: string;
 
-  @OneToMany(() => Item, (item) => item.category, { onDelete: 'CASCADE' })
+  @OneToMany(() => Item, (item) => item.category, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   items: Item[];
 }

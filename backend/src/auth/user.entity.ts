@@ -23,13 +23,15 @@ export class User {
   password: string;
 
   @OneToMany(() => Item, (item) => item.creator, {
-    eager: false,
+    eager: true,
+    cascade: true,
     onDelete: 'CASCADE',
   })
   items: Item[];
 
   @OneToMany(() => Review, (review) => review.author, {
     eager: true,
+    cascade: true,
     onDelete: 'CASCADE',
   })
   reviews: Review[];
