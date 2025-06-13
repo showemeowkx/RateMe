@@ -1,12 +1,14 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Inject,
   Param,
   Post,
   Query,
   UploadedFile,
+  UseFilters,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
@@ -22,6 +24,8 @@ import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.d
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { ItemsServiceInterface } from './items-service.interfase';
 import { SortItemsDto } from './dto/sort-items.dto';
+import { ValidationExceptionFilter } from 'src/common/validation-exception-filter';
+import { ModeratorGuard } from 'src/common/decorators/guards/moderator.guard';
 
 const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
@@ -47,6 +51,7 @@ export class ItemsController {
 
   @Post()
   @UseGuards(AuthGuard())
+  @UseFilters(ValidationExceptionFilter)
   @UseInterceptors(
     FileInterceptor(
       'file',
@@ -57,7 +62,13 @@ export class ItemsController {
     @Body() addItemDto: AddItemDto,
     @GetUser() user: User,
     @UploadedFile() file: Express.Multer.File,
-  ): Promise<void> {
+  ): Promise<{ itemId: string }> {
     return this.itemsService.addItem(addItemDto, user, file);
+  }
+
+  @Delete('/:itemId')
+  @UseGuards(ModeratorGuard)
+  deleteItem(@Param('itemId') itemId: string): Promise<void> {
+    return this.itemsService.deleteItem(itemId);
   }
 }

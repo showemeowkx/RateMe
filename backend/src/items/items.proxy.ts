@@ -59,8 +59,15 @@ export class ItemsProxy implements ItemsServiceInterface {
     addItemDto: AddItemDto,
     user: User,
     file: Express.Multer.File,
-  ): Promise<void> {
+  ): Promise<{ itemId: string }> {
+    this.cache.flushAll();
     this.logger.verbose(`Adding item... {name: ${addItemDto.name}}`);
     return this.itemsService.addItem(addItemDto, user, file);
+  }
+
+  async deleteItem(itemId: string): Promise<void> {
+    this.cache.flushAll();
+    this.logger.verbose(`Deleting an item... {itemId: ${itemId}}`);
+    return this.itemsService.deleteItem(itemId);
   }
 }

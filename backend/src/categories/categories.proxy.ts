@@ -34,9 +34,16 @@ export class CategoriesProxy implements CategoriesServiceIInterface {
     createCategoryDto: CreateCategoryDto,
     file: Express.Multer.File,
   ): Promise<void> {
+    this.cache.flushAll();
     this.logger.verbose(
       `Creating a new category... {slug: ${createCategoryDto.slug}}`,
     );
     return this.categoriesService.createCategory(createCategoryDto, file);
+  }
+
+  async deleteCategory(slug: string): Promise<void> {
+    this.cache.flushAll();
+    this.logger.verbose(`Deleting a category... {slug: ${slug}}`);
+    return this.categoriesService.deleteCategory(slug);
   }
 }

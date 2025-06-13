@@ -22,10 +22,18 @@ export class User {
   @Column()
   password: string;
 
-  @OneToMany(() => Item, (item) => item.creator, { eager: false })
+  @OneToMany(() => Item, (item) => item.creator, {
+    eager: true,
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   items: Item[];
 
-  @OneToMany(() => Review, (review) => review.author, { eager: true })
+  @OneToMany(() => Review, (review) => review.author, {
+    eager: true,
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   reviews: Review[];
 
   @Column()

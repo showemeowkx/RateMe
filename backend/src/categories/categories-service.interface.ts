@@ -9,4 +9,6 @@ export interface CategoriesServiceIInterface {
     createCategoryDto: CreateCategoryDto,
     file: Express.Multer.File,
   ): Promise<void>;
+
+  deleteCategory(slug: string): Promise<void>;
 }

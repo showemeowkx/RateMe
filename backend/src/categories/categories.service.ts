@@ -11,6 +11,7 @@ import { Repository } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import * as fs from 'fs/promises';
 import { GetCategoriesFilterDto } from './dto/get-categories-filter.dto';
+import { getPrimaryPath, getRealPath } from 'src/common/file-upload';
 
 @Injectable()
 export class CategoriesService implements CategoriesService {
@@ -64,7 +65,7 @@ export class CategoriesService implements CategoriesService {
       name,
       slug,
       color,
-      imagePath,
+      imagePath: getPrimaryPath(imagePath),
     });
 
     try {
@@ -82,6 +83,44 @@ export class CategoriesService implements CategoriesService {
       }
       this.logger.error(
         `[INTERNAL] Failed to create a category {slug: ${slug}}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async deleteCategory(slug: string): Promise<void> {
+    const category = await this.categoriesRepository.findOne({
+      where: { slug },
+      relations: ['items'],
+    });
+
+    if (!category) {
+      this.logger.error(
+        `[NOT FOUND] Failed to delete a category {slug: ${slug}}`,
+      );
+      throw new ConflictException(
+        `A category with slug '${slug}' doesn't exist`,
+      );
+    }
+
+    try {
+      const imagePath = getRealPath(category.imagePath);
+      const categoryItems = category.items;
+      const itemsImagePaths = categoryItems.map((item) =>
+        getRealPath(item.imagePath),
+      );
+      await this.categoriesRepository.remove(category).then(
+        async () =>
+          await fs.unlink(imagePath).then(async () => {
+            for (const imagePath of itemsImagePaths) {
+              await fs.unlink(imagePath);
+            }
+          }),
+      );
+    } catch (error) {
+      this.logger.error(
+        `[INTERNAL] Failed to delete a category {slug: ${slug}}`,
         error.stack,
       );
       throw new InternalServerErrorException();

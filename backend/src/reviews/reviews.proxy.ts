@@ -62,9 +62,16 @@ export class ReviewsProxy implements ReviewsServiceInterface {
     user: User,
     itemId: string,
   ): Promise<void> {
+    this.cache.flushAll();
     this.logger.verbose(
       `Creating a review... {user: ${user.username}, itemId: ${itemId}}`,
     );
     return this.reviewsService.createReview(createReviewDto, user, itemId);
+  }
+
+  async deleteReview(reviewId: string): Promise<void> {
+    this.cache.flushAll();
+    this.logger.verbose(`Deleting a review... {reviewId: ${reviewId}`);
+    return this.reviewsService.deleteReview(reviewId);
   }
 }

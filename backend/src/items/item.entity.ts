@@ -32,6 +32,9 @@ export class Item {
   @Column('double precision')
   rating: number;
 
-  @OneToMany(() => Review, (review) => review.item)
+  @OneToMany(() => Review, (review) => review.item, {
+    cascade: true,
+    onDelete: 'CASCADE',
+  })
   reviews: Review[];
 }

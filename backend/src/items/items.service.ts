@@ -20,6 +20,7 @@ import { paginate } from 'src/common/pagination/pagination';
 import { ItemsServiceInterface } from './items-service.interfase';
 import { CategoriesServiceIInterface } from 'src/categories/categories-service.interface';
 import { SortItemsDto } from './dto/sort-items.dto';
+import { getPrimaryPath, getRealPath } from 'src/common/file-upload';
 
 @Injectable()
 export class ItemsService implements ItemsServiceInterface {
@@ -117,7 +118,7 @@ export class ItemsService implements ItemsServiceInterface {
     addItemDto: AddItemDto,
     user: User,
     file: Express.Multer.File,
-  ): Promise<void> {
+  ): Promise<{ itemId: string }> {
     const { categorySlug, name, description } = addItemDto;
 
     const imagePath = file?.path;
@@ -133,9 +134,17 @@ export class ItemsService implements ItemsServiceInterface {
       slug: categorySlug,
     });
 
+    if (category.length < 1) {
+      await fs.unlink(imagePath);
+      this.logger.error(`[WRONG INPUT] Failed to add an item {name: ${name}}`);
+      throw new NotFoundException(
+        `A category with slug '${categorySlug}' doesn't exist`,
+      );
+    }
+
     const item = this.itemsRepository.create({
       creator: user,
-      imagePath,
+      imagePath: getPrimaryPath(imagePath),
       category: category[0],
       name,
       description,
@@ -144,6 +153,7 @@ export class ItemsService implements ItemsServiceInterface {
 
     try {
       await this.itemsRepository.save(item);
+      return { itemId: item.id };
     } catch (error) {
       await fs.unlink(imagePath);
       if (error.code === '23505') {
@@ -154,6 +164,20 @@ export class ItemsService implements ItemsServiceInterface {
       }
       this.logger.error(
         `[INTERNAL] Failed to add an item {name: ${name}}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async deleteItem(itemId: string): Promise<void> {
+    const item = await this.getItemById(itemId);
+    try {
+      const imagePath = getRealPath(item.imagePath);
+      await this.itemsRepository.remove(item).then(() => fs.unlink(imagePath));
+    } catch (error) {
+      this.logger.error(
+        `[INTERNAL] Failed to delete an item {itemId: ${item.id}`,
         error.stack,
       );
       throw new InternalServerErrorException();

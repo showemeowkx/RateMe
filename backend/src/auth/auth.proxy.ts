@@ -37,7 +37,13 @@ export class AuthProxy implements AuthServiceInterface {
     return this.authService.getUserById(userId);
   }
 
+  async getProfileInfo(user: User): Promise<User> {
+    this.logger.verbose(`Getting profile info... {username: ${user.username}}`);
+    return this.authService.getProfileInfo(user);
+  }
+
   async createUser(authSignUpCredDto: AuthSignUpCredDto): Promise<void> {
+    this.cache.flushAll();
     this.logger.verbose(
       `Creating a user... {username: ${authSignUpCredDto.username}}`,
     );
@@ -50,6 +56,7 @@ export class AuthProxy implements AuthServiceInterface {
   }
 
   async updatePfp(user: User, file: Express.Multer.File): Promise<void> {
+    this.cache.flushAll();
     this.logger.verbose(
       `Updating profile picture... {username: ${user.username}}`,
     );
@@ -57,6 +64,7 @@ export class AuthProxy implements AuthServiceInterface {
   }
 
   async setModeratorStatus(user: User): Promise<void> {
+    this.cache.flushAll();
     this.logger.verbose(
       `Setting moderator status... {username: ${user.username}`,
     );
@@ -67,7 +75,15 @@ export class AuthProxy implements AuthServiceInterface {
     user: User,
     updateCredentialsDto: UpdateCredentialsDto,
   ): Promise<{ accessToken: string }> {
+    this.cache.flushAll();
     this.logger.verbose(`Updating credentials... {username: ${user.username}}`);
     return this.authService.updateCredentials(user, updateCredentialsDto);
+  }
+
+  async deleteUser(toDelete: string | User): Promise<void> {
+    const userId = typeof toDelete === 'string' ? toDelete : toDelete.id;
+    this.cache.flushAll();
+    this.logger.verbose(`Deleting a user... {userId: ${userId}}`);
+    return this.authService.deleteUser(toDelete);
   }
 }

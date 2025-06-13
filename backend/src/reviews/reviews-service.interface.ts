@@ -20,4 +20,6 @@ export interface ReviewsServiceInterface {
     user: User,
     itemId: string,
   ): Promise<void>;
+
+  deleteReview(reviewId: string): Promise<void>;
 }
