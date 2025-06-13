@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Profile.module.css';
+import styles from './ProfileButton.module.css';
 import { useNavigate } from 'react-router-dom';
 import { FaRegUser } from 'react-icons/fa';
 import Cookies from 'js-cookie';

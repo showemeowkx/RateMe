@@ -37,13 +37,16 @@ export const fetchProducts = async (
   return data || [];
 };
 
-export const fetchProductById = (productId) => {
-  return fetchData(`${URL}/items/${productId}`);
+export const fetchProductById = async (productId) => {
+  return await fetchData(`${URL}/items/${productId}`);
 };
 
-export const addProduct = (dto) => {
-  return fetchData(`${URL}/items`, {
-    method: 'POST',
-    body: dtoConvert(dto),
-  });
-};
+export const addProduct = async (dto) =>
+  await fetchData(
+    `${URL}/items`,
+    {
+      method: 'POST',
+      body: dtoConvert(dto),
+    },
+    false
+  );
