@@ -43,7 +43,7 @@ export default function Registration() {
       await signUp(registerForm);
       navigate('/');
     } catch (err) {
-      setError(err.messages);
+      setError(err.message);
     }
   };
 
