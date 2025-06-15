@@ -4,9 +4,8 @@ from dto.review_dto import ReviewDto
 import uvicorn
 import sys
 import os
-#TO BE FIXED
-# sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-# from model.label_data import *
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from model.label_data import main
 
 load_dotenv()
 model_port = int(os.getenv('PORT'))
@@ -16,8 +15,8 @@ app = FastAPI()
 
 @app.post("/")
 async def analyze_rating(data: ReviewDto):
-    print('placeholder method')
-    return data
+    res = main(data.model_dump())
+    return {"isRecommended":res[0].item()}
 
 if __name__ == "__main__":
     uvicorn.run(app, host=model_host, port=model_port)

@@ -1,5 +1,6 @@
 node_modules/
 data/model/reviews_marked_iphone.csv
 __pycache__/
+venv/
 *.env
 desktop.ini
