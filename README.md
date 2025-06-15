@@ -26,7 +26,7 @@ Ensure you have the following installed:
 
 - Docker, Docker Compose
 
-- Python 3
+- Python 3.10.11
 
 2️⃣ Installation
 
@@ -39,11 +39,7 @@ cd rate-me
 
 Create an environment file
 
-```bash
-cp .env
-```
-
-Edit ```.env``` and update any required values (e.g., DB credentials, ports).
+Edit `.env` and update any required values (e.g., DB credentials, ports).
 
 Build the Docker images
 

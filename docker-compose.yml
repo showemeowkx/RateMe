@@ -48,5 +48,21 @@ services:
     ports:
       - "${DB_PORT}:5432"
 
+  model:
+    build:
+      context: ./data
+      dockerfile: Dockerfile
+    container_name: fastapi-backend
+    ports:
+      - "${MODEL_PORT}:${MODEL_PORT}"
+    environment:
+      - PORT=${MODEL_PORT}
+      - HOST=${MODEL_HOST}
+    restart: unless-stopped
+    env_file:
+      - ./.env
+    volumes:
+      - .:/app
+
 volumes:
   pgdata:

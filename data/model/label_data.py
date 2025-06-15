@@ -97,10 +97,10 @@ def get_review(values_list):
     return df
 
 def load_models():
-    tfidf_liked = joblib.load('./model/pkl_models/tfidf_liked.pkl')
-    tfidf_disliked = joblib.load('./model/pkl_models/tfidf_disliked.pkl')
-    tfidf_comment = joblib.load('./model/pkl_models/tfidf_comment.pkl')
-    model = joblib.load('./model/pkl_models/model.pkl')
+    tfidf_liked = joblib.load('./data/model/pkl_models/tfidf_liked.pkl')
+    tfidf_disliked = joblib.load('./data/model/pkl_models/tfidf_disliked.pkl')
+    tfidf_comment = joblib.load('./data/model/pkl_models/tfidf_comment.pkl')
+    model = joblib.load('./data/model/pkl_models/model.pkl')
     return tfidf_liked, tfidf_disliked, tfidf_comment, model
 
 def label_data(values_list, tfidf_liked, tfidf_disliked, tfidf_comment, model):

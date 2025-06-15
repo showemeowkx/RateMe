@@ -9,9 +9,9 @@ import os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from model.label_data import main
 
-load_dotenv()
-model_port = int(os.getenv('PORT'))
-model_host = os.getenv('HOST')
+load_dotenv('./.env')
+model_port = int(os.getenv('MODEL_PORT'))
+model_host = os.getenv('MODEL_HOST')
 
 app = FastAPI()
 
