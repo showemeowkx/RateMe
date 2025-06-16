@@ -5,6 +5,7 @@ import Product from './pages/Product/Product';
 import Registration from './pages/Registration/Registration';
 import Login from './pages/Login/Login';
 import AddProduct from './pages/AddProduct/AddProduct';
+import Profile from './pages/Profile/Profile';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
           <Route path='/sign-up' element={<Registration />} />
           <Route path='/sign-in' element={<Login />} />
           <Route path='/add-product' element={<AddProduct />} />
+          <Route path='/profile' element={<Profile />} />
         </Routes>
       </Router>
     </div>
