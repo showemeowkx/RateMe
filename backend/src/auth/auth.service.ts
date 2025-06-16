@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -192,17 +191,18 @@ export class AuthService implements AuthServiceInterface {
   async updateCredentials(
     user: User,
     updateCredentialsDto: UpdateCredentialsDto,
+    // file: Express.Multer.File,
   ): Promise<{ accessToken }> {
-    const { username, password } = updateCredentialsDto;
-    let credential: 'username' | 'password';
-    let newValue: string;
-    let loginValue: string;
+    const { username, password, email } = updateCredentialsDto;
+    const originalUsername = user.username;
+    let newLogin: string = originalUsername;
+    let newPassword: string = user.password;
 
     if (username) {
-      if (username === user.username) {
+      if (username === originalUsername) {
         throw new ConflictException(
           this.logger.error(
-            `[SAME INPUT] Failed to update credentials {username: ${user.username}}`,
+            `[SAME INPUT] Failed to update credentials {username: ${originalUsername}}}`,
           ),
           'New username must be different from current one',
         );
@@ -212,37 +212,50 @@ export class AuthService implements AuthServiceInterface {
       for (const sameUser of sameUsers) {
         if (sameUser.username === username) {
           this.logger.error(
-            `[ALREADY EXISTS] Failed to update credentials {username: ${user.username}}`,
+            `[ALREADY EXISTS] Failed to update credentials {username: ${originalUsername}}`,
           );
           throw new ConflictException('This username is already taken');
         }
       }
-      credential = 'username';
-      newValue = username;
-      loginValue = username;
-    } else if (password) {
-      credential = 'password';
+
+      newLogin = username;
+    }
+
+    if (password) {
       const salt = await bcrypt.genSalt();
-      newValue = await bcrypt.hash(password, salt);
-      loginValue = user.username;
-    } else {
-      this.logger.error(
-        `[WRONG INPUT] Failed to update credentials {username: ${user.username}}`,
-      );
-      throw new BadRequestException('No credentials to update');
+      const hashedPassword = await bcrypt.hash(password, salt);
+      newPassword = hashedPassword;
+    }
+
+    if (email) {
+      if (email === user.email) {
+        throw new ConflictException(
+          this.logger.error(
+            `[SAME INPUT] Failed to update credentials {username: ${originalUsername}}}`,
+          ),
+          'New email must be different from current one',
+        );
+      }
+
+      const sameUsers = await this.getUsers({ email: email });
+      for (const sameUser of sameUsers) {
+        if (sameUser.email === email) {
+          this.logger.error(
+            `[ALREADY EXISTS] Failed to update credentials {username: ${originalUsername}}`,
+          );
+          throw new ConflictException('This email is already taken');
+        }
+      }
+
+      newLogin = email;
     }
 
     try {
       await this.userRepository.update(user.id, {
-        [credential]: newValue,
+        username: username ?? originalUsername,
+        email: email ?? user.email,
+        password: newPassword ?? user.password,
       });
-
-      const payload: JwtPayload = {
-        login: loginValue,
-        isModerator: user.isModerator,
-      };
-      const accessToken: string = await this.jwtService.signAsync(payload);
-      return { accessToken };
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to update credentials {username: ${user.username}}`,
@@ -250,6 +263,13 @@ export class AuthService implements AuthServiceInterface {
       );
       throw new InternalServerErrorException();
     }
+
+    const payload: JwtPayload = {
+      login: newLogin,
+      isModerator: user.isModerator,
+    };
+    const accessToken: string = await this.jwtService.signAsync(payload);
+    return { accessToken };
   }
 
   async deleteUser(toDelete: string | User): Promise<void> {

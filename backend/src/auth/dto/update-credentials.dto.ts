@@ -5,6 +5,7 @@ import {
   Matches,
   IsOptional,
   IsNotEmpty,
+  IsEmail,
 } from 'class-validator';
 
 export class UpdateCredentialsDto {
@@ -22,4 +23,9 @@ export class UpdateCredentialsDto {
   @IsOptional()
   @Matches(/^(?=.*[a-z])(?=.*\d)/, { message: 'The password is too weak!' })
   password?: string;
+
+  @IsEmail()
+  @IsNotEmpty()
+  @IsOptional()
+  email?: string;
 }
