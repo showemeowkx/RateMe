@@ -55,14 +55,6 @@ export class AuthProxy implements AuthServiceInterface {
     return this.authService.signIn(authSignInCredDto);
   }
 
-  async updatePfp(user: User, file: Express.Multer.File): Promise<void> {
-    this.cache.flushAll();
-    this.logger.verbose(
-      `Updating profile picture... {username: ${user.username}}`,
-    );
-    return this.authService.updatePfp(user, file);
-  }
-
   async setModeratorStatus(user: User): Promise<void> {
     this.cache.flushAll();
     this.logger.verbose(
@@ -74,10 +66,11 @@ export class AuthProxy implements AuthServiceInterface {
   async updateCredentials(
     user: User,
     updateCredentialsDto: UpdateCredentialsDto,
+    file: Express.Multer.File,
   ): Promise<{ accessToken: string }> {
     this.cache.flushAll();
     this.logger.verbose(`Updating credentials... {username: ${user.username}}`);
-    return this.authService.updateCredentials(user, updateCredentialsDto);
+    return this.authService.updateCredentials(user, updateCredentialsDto, file);
   }
 
   async deleteUser(toDelete: string | User): Promise<void> {
