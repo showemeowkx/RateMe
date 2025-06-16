@@ -15,7 +15,7 @@ model_host = os.getenv('MODEL_HOST')
 
 app = FastAPI()
 
-async def analyze_review(review: ReviewDto):
+async def analyze_review(review: ReviewDto, models_path):
     try:
         from concurrent.futures import ThreadPoolExecutor
         from functools import partial
@@ -39,7 +39,7 @@ async def startup_event():
 
 @app.post("/")
 async def analyze_rating(data: ReviewDto):
-    return await analyze_review(data.model_dump())
+    return await analyze_review(data.model_dump(), "./data/models/pkl-models/")
 
 if __name__ == "__main__":
     uvicorn.run(app, host=model_host, port=model_port, loop="auto")

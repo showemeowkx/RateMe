@@ -96,11 +96,11 @@ def get_review(values_list):
         df[col + "_len"] = df[col].apply(lambda x: len(x.split()))
     return df
 
-def load_models():
-    tfidf_liked = joblib.load('./data/model/pkl_models/tfidf_liked.pkl')
-    tfidf_disliked = joblib.load('./data/model/pkl_models/tfidf_disliked.pkl')
-    tfidf_comment = joblib.load('./data/model/pkl_models/tfidf_comment.pkl')
-    model = joblib.load('./data/model/pkl_models/model.pkl')
+def load_models(models_path):
+    tfidf_liked = joblib.load(models_path+'tfidf_liked.pkl')
+    tfidf_disliked = joblib.load(models_path+'tfidf_disliked.pkl')
+    tfidf_comment = joblib.load(models_path+'pkl_models/tfidf_comment.pkl')
+    model = joblib.load(models_path+'model.pkl')
     return tfidf_liked, tfidf_disliked, tfidf_comment, model
 
 def label_data(values_list, tfidf_liked, tfidf_disliked, tfidf_comment, model):
@@ -121,8 +121,8 @@ def label_data(values_list, tfidf_liked, tfidf_disliked, tfidf_comment, model):
     y_pred = (y_pred_prob > 0.4).astype(int)
     return y_pred
 
-def main(example):
-    tfidf_liked, tfidf_disliked, tfidf_comment, model = load_models()
+def main(example, models_path):
+    tfidf_liked, tfidf_disliked, tfidf_comment, model = load_models(models_path)
     values_list = [example[k] for k in ["experience", "liked", "disliked", "comment"]]
     is_recommended = label_data(values_list, tfidf_liked, tfidf_disliked, tfidf_comment, model)
     return is_recommended
