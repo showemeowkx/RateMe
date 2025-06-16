@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaRegUser } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 
-export default function Profile() {
+export default function ProfileButton() {
   const navigate = useNavigate();
 
   const handleNavigation = () => {

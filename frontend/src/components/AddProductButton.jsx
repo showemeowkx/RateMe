@@ -4,7 +4,7 @@ import { FaPlusSquare } from 'react-icons/fa';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 
-export default function AddProduct() {
+export default function AddProductButton() {
   const [isMobile, setIsMobile] = useState(window.innerWidth < 576);
   const navigate = useNavigate();
 
