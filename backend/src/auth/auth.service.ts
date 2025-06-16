@@ -96,8 +96,8 @@ export class AuthService implements AuthServiceInterface {
     }
   }
 
-  async createUser(authSignInCredDto: AuthSignUpCredDto): Promise<void> {
-    const { name, surname, username, email, password } = authSignInCredDto;
+  async createUser(authSignUpCredDto: AuthSignUpCredDto): Promise<void> {
+    const { name, surname, username, email, password } = authSignUpCredDto;
 
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -220,9 +220,20 @@ export class AuthService implements AuthServiceInterface {
     updateCredentialsDto: UpdateCredentialsDto,
     file: Express.Multer.File,
   ): Promise<{ accessToken }> {
-    const { username, password, email } = updateCredentialsDto;
+    const { name, surname, username, password, email } = updateCredentialsDto;
     let newLogin: string = user.username;
     let newPassword: string = user.password;
+    let newName: string = user.name;
+
+    if (name) {
+      const nameSplit = newName.split(' ');
+      newName = `${name.trim()} ${nameSplit[1]}`;
+    }
+
+    if (surname) {
+      const nameSplit = newName.split(' ');
+      newName = `${nameSplit[0]} ${surname.trim()}`;
+    }
 
     if (username) {
       newLogin = await this.checkLogin(username, user.username, 'username');
@@ -246,7 +257,8 @@ export class AuthService implements AuthServiceInterface {
       await this.userRepository.update(user.id, {
         username: username ?? user.username,
         email: email ?? user.email,
-        password: newPassword ?? user.password,
+        password: newPassword,
+        name: newName,
       });
     } catch (error) {
       this.logger.error(
