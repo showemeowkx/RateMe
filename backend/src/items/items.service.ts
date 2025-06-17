@@ -170,6 +170,31 @@ export class ItemsService implements ItemsServiceInterface {
     }
   }
 
+  async updateRating(
+    itemId: string,
+    status: { isPositive: '0' | '1' },
+  ): Promise<void> {
+    const item = await this.getItemById(itemId);
+    const { isPositive } = status;
+    try {
+      const reviewAmount = item.reviews.length;
+      const positiveReviews = (item.rating * reviewAmount) / 100;
+      const newRating =
+        isPositive === '1'
+          ? ((positiveReviews + 1) / (reviewAmount + 1)) * 100
+          : (positiveReviews / (reviewAmount + 1)) * 100;
+      await this.itemsRepository.update(itemId, {
+        rating: parseFloat(newRating.toFixed(2)),
+      });
+    } catch (error) {
+      this.logger.error(
+        `[INTERNAL] Failed to update rating {itemId: ${itemId}}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
+  }
+
   async deleteItem(itemId: string): Promise<void> {
     const item = await this.getItemById(itemId);
     try {
