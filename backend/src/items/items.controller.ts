@@ -67,6 +67,7 @@ export class ItemsController {
   }
 
   @Patch('/:itemId')
+  @UseGuards(AuthGuard())
   updateRating(
     @Param('itemId') itemId: string,
     @Query() status: { isPositive: '0' | '1' },
