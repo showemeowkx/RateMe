@@ -59,22 +59,7 @@ export class AuthController {
     return this.authService.signIn(authSignInCredDto);
   }
 
-  @Patch('/pfp')
-  @UseGuards(AuthGuard())
-  @UseInterceptors(
-    FileInterceptor(
-      'file',
-      setStorageOptions('user-images', allowedExtensions),
-    ),
-  )
-  updatePfp(
-    @GetUser() user: User,
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<void> {
-    return this.authService.updatePfp(user, file);
-  }
-
-  @Patch('moderator')
+  @Patch('/moderator')
   @UseGuards(AuthGuard())
   setModeratorStatus(@GetUser() user: User): Promise<void> {
     return this.authService.setModeratorStatus(user);
@@ -82,11 +67,18 @@ export class AuthController {
 
   @Patch('/update-credentials')
   @UseGuards(AuthGuard())
+  @UseInterceptors(
+    FileInterceptor(
+      'file',
+      setStorageOptions('user-images', allowedExtensions),
+    ),
+  )
   updateCredentials(
     @GetUser() user: User,
     @Body() updateCredentialsDto: UpdateCredentialsDto,
+    @UploadedFile() file: Express.Multer.File,
   ): Promise<{ accessToken: string }> {
-    return this.authService.updateCredentials(user, updateCredentialsDto);
+    return this.authService.updateCredentials(user, updateCredentialsDto, file);
   }
 
   @Delete('id/:userId')

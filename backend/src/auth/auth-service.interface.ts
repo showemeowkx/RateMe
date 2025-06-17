@@ -17,13 +17,12 @@ export interface AuthServiceInterface {
     authSignInCredDto: AuthSignInCredDto,
   ): Promise<{ accessToken: string }>;
 
-  updatePfp(user: User, file: Express.Multer.File): Promise<void>;
-
   setModeratorStatus(user: User): Promise<void>;
 
   updateCredentials(
     user: User,
     updateCredentialsDto: UpdateCredentialsDto,
+    file: Express.Multer.File,
   ): Promise<{ accessToken: string }>;
 
   deleteUser(toDelete: string | User): Promise<void>;

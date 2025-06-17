@@ -97,8 +97,8 @@ export class ReviewsService implements ReviewsServiceInterface {
 
     const { usePeriod, liked, disliked, text } = createReviewDto;
 
-    const likedChecked = liked ? liked : 'Not defined';
-    const dislikedChecked = disliked ? disliked : 'Not defined';
+    const likedChecked = liked ? liked : 'Не визначено';
+    const dislikedChecked = disliked ? disliked : 'Не визначено';
 
     const review = this.reviewRepository.create({
       item: item,

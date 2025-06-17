@@ -5,7 +5,6 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { configValidationSchema } from './config.schema';
 import { ItemsModule } from './items/items.module';
 import { ReviewsModule } from './reviews/reviews.module';
-import { CategoriesController } from './categories/categories.controller';
 import { CategoriesModule } from './categories/categories.module';
 
 @Module({
@@ -13,6 +12,7 @@ import { CategoriesModule } from './categories/categories.module';
     AuthModule,
     ItemsModule,
     ReviewsModule,
+    CategoriesModule,
     ConfigModule.forRoot({
       envFilePath: ['../.env'],
       validationSchema: configValidationSchema,
@@ -36,8 +36,6 @@ import { CategoriesModule } from './categories/categories.module';
         };
       },
     }),
-    CategoriesModule,
   ],
-  controllers: [CategoriesController],
 })
 export class AppModule {}
