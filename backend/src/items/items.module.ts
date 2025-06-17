@@ -6,10 +6,12 @@ import { Item } from './item.entity';
 import { NestjsFormDataModule } from 'nestjs-form-data';
 import { CategoriesModule } from 'src/categories/categories.module';
 import { ItemsProxy } from './items.proxy';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Item]),
+    AuthModule,
     CategoriesModule,
     NestjsFormDataModule,
   ],
