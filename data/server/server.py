@@ -39,7 +39,6 @@ async def analyze_review(review: ReviewDto, models_path):
 
 @app.on_event("startup")
 async def startup_event():
-    import asyncio
     app.state.loop = asyncio.get_event_loop()
 
 @app.post("/")
