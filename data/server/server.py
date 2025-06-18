@@ -15,7 +15,7 @@ from model.label_data import main
 
 load_dotenv("./.env")
 model_port = int(os.getenv("MODEL_PORT"))
-model_host = os.getenv("MODEL_HOST")
+model_host = os.getenv("MODEL_HOST_DEV")
 
 app = FastAPI()
 

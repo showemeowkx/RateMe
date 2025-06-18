@@ -121,7 +121,10 @@ export class ReviewsService implements ReviewsServiceInterface {
         };
 
         try {
-          const host = process.env.MODEL_HOST;
+          const host =
+            process.env.NODE_ENV === 'production'
+              ? process.env.MODEL_HOST_PROD
+              : process.env.MODEL_HOST_DEV;
           const port = process.env.MODEL_PORT;
 
           const response = await firstValueFrom(
