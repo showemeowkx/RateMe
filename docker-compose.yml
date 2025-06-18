@@ -57,7 +57,7 @@ services:
       - "${MODEL_PORT}:${MODEL_PORT}"
     environment:
       - PORT=${MODEL_PORT}
-      - HOST=${MODEL_HOST}
+      - HOST=${MODEL_HOST_PROD}
     restart: unless-stopped
     env_file:
       - ./.env

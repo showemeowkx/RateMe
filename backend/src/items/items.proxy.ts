@@ -65,6 +65,15 @@ export class ItemsProxy implements ItemsServiceInterface {
     return this.itemsService.addItem(addItemDto, user, file);
   }
 
+  async updateRating(
+    itemId: string,
+    status: { isRecommended: 0 | 1 },
+  ): Promise<void> {
+    this.cache.flushAll();
+    this.logger.verbose(`Updating item rating... {itemId: ${itemId}}`);
+    return this.itemsService.updateRating(itemId, status);
+  }
+
   async deleteItem(itemId: string): Promise<void> {
     this.cache.flushAll();
     this.logger.verbose(`Deleting an item... {itemId: ${itemId}}`);

@@ -6,9 +6,15 @@ import { Review } from './review.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { ItemsModule } from 'src/items/items.module';
 import { ReviewsProxy } from './reviews.proxy';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Review]), AuthModule, ItemsModule],
+  imports: [
+    TypeOrmModule.forFeature([Review]),
+    AuthModule,
+    ItemsModule,
+    HttpModule,
+  ],
   controllers: [ReviewsController],
   providers: [
     ReviewsService,

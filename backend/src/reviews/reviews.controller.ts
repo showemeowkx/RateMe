@@ -52,7 +52,7 @@ export class ReviewsController {
     return this.reviewsService.createReview(createReviewDto, user, itemId);
   }
 
-  @Delete('review/:reviewId')
+  @Delete('/:reviewId')
   @UseGuards(ModeratorGuard)
   deleteReview(@Param('reviewId') reviewId: string): Promise<void> {
     return this.reviewsService.deleteReview(reviewId);

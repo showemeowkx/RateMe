@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   ConflictException,
@@ -18,6 +19,8 @@ import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { ItemsServiceInterface } from 'src/items/items-service.interfase';
 import { ReviewsServiceInterface } from './reviews-service.interface';
 import { AuthServiceInterface } from 'src/auth/auth-service.interface';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class ReviewsService implements ReviewsServiceInterface {
@@ -26,6 +29,7 @@ export class ReviewsService implements ReviewsServiceInterface {
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
     @Inject('AUTH_SERVICE') private authService: AuthServiceInterface,
     @Inject('ITEMS_SERVICE') private itemsService: ItemsServiceInterface,
+    private httpService: HttpService,
   ) {}
 
   async getReviewsByItem(
@@ -94,9 +98,7 @@ export class ReviewsService implements ReviewsServiceInterface {
     }
 
     const item = await this.itemsService.getItemById(itemId);
-
     const { usePeriod, liked, disliked, text } = createReviewDto;
-
     const likedChecked = liked ? liked : 'Не визначено';
     const dislikedChecked = disliked ? disliked : 'Не визначено';
 
@@ -110,11 +112,37 @@ export class ReviewsService implements ReviewsServiceInterface {
     });
 
     try {
-      await this.reviewRepository.save(review);
+      await this.reviewRepository.save(review).then(async () => {
+        const reviewData = {
+          experience: usePeriod.toLowerCase(),
+          liked: likedChecked,
+          disliked: dislikedChecked,
+          comment: text,
+        };
+
+        try {
+          const host =
+            process.env.NODE_ENV === 'production'
+              ? process.env.MODEL_HOST_PROD
+              : process.env.MODEL_HOST_DEV;
+          const port = process.env.MODEL_PORT;
+
+          const response = await firstValueFrom(
+            this.httpService.post(`http://${host}:${port}`, reviewData),
+          );
+          this.logger.verbose(
+            `Received from model: ${JSON.stringify(response.data)}`,
+          );
+          await this.itemsService.updateRating(itemId, response.data);
+        } catch (error) {
+          this.logger.error('[MODEL] Failed to analyze a review', error.stack);
+          await this.deleteReview(review.id);
+          throw new Error(error.message);
+        }
+      });
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to create a review {item: ${item.name}, user: ${user.username}}`,
-
         error.stack,
       );
       throw new InternalServerErrorException();
