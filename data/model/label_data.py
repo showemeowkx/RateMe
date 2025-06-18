@@ -6,7 +6,7 @@ from stop_words import get_stop_words
 import joblib
 from sklearn.metrics import classification_report
 import pymorphy2
-import json
+import os
 DetectorFactory.seed = 0
 
 # pymorphy2 для обох мов
@@ -97,10 +97,10 @@ def get_review(values_list):
     return df
 
 def load_models(models_path):
-    tfidf_liked = joblib.load(models_path+'tfidf_liked.pkl')
-    tfidf_disliked = joblib.load(models_path+'tfidf_disliked.pkl')
-    tfidf_comment = joblib.load(models_path+'pkl_models/tfidf_comment.pkl')
-    model = joblib.load(models_path+'model.pkl')
+    tfidf_liked = joblib.load(os.path.join(models_path, "tfidf_liked.pkl"))
+    tfidf_disliked = joblib.load(os.path.join(models_path, "tfidf_disliked.pkl"))
+    tfidf_comment = joblib.load(os.path.join(models_path, "tfidf_comment.pkl"))
+    model = joblib.load(os.path.join(models_path, "model.pkl"))
     return tfidf_liked, tfidf_disliked, tfidf_comment, model
 
 def label_data(values_list, tfidf_liked, tfidf_disliked, tfidf_comment, model):
