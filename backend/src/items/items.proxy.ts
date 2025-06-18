@@ -67,7 +67,7 @@ export class ItemsProxy implements ItemsServiceInterface {
 
   async updateRating(
     itemId: string,
-    status: { isPositive: '0' | '1' },
+    status: { isRecommended: 0 | 1 },
   ): Promise<void> {
     this.cache.flushAll();
     this.logger.verbose(`Updating item rating... {itemId: ${itemId}}`);
