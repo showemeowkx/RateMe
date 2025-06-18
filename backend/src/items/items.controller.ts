@@ -5,7 +5,6 @@ import {
   Get,
   Inject,
   Param,
-  Patch,
   Post,
   Query,
   UploadedFile,
@@ -65,15 +64,6 @@ export class ItemsController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ itemId: string }> {
     return this.itemsService.addItem(addItemDto, user, file);
-  }
-
-  @Patch('/:itemId')
-  @UseGuards(AuthGuard())
-  updateRating(
-    @Param('itemId') itemId: string,
-    @Query() status: { isPositive: '0' | '1' },
-  ): Promise<void> {
-    return this.itemsService.updateRating(itemId, status);
   }
 
   @Delete('/:itemId')
