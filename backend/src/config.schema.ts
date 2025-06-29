@@ -10,4 +10,7 @@ export const configValidationSchema = Joi.object({
   DB_HOST_PROD: Joi.string().required(),
   DB_HOST_DEV: Joi.string(),
   DB_PORT: Joi.number().default(5432).required(),
+  STRIPE_PUBLIC_KEY: Joi.string().required(),
+  STRIPE_SECRET_KEY: Joi.string().required(),
+  STRIPE_WEBHOOK_KEY: Joi.string().required(),
 });

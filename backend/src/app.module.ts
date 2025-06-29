@@ -6,6 +6,7 @@ import { configValidationSchema } from './config.schema';
 import { ItemsModule } from './items/items.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { CategoriesModule } from './categories/categories.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { CategoriesModule } from './categories/categories.module';
     ItemsModule,
     ReviewsModule,
     CategoriesModule,
+    PaymentModule,
     ConfigModule.forRoot({
       envFilePath: ['../.env'],
       validationSchema: configValidationSchema,

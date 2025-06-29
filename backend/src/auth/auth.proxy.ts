@@ -55,12 +55,10 @@ export class AuthProxy implements AuthServiceInterface {
     return this.authService.signIn(authSignInCredDto);
   }
 
-  async setModeratorStatus(user: User): Promise<void> {
+  async setModeratorStatus(userId: string): Promise<void> {
     this.cache.flushAll();
-    this.logger.verbose(
-      `Setting moderator status... {username: ${user.username}`,
-    );
-    return this.authService.setModeratorStatus(user);
+    this.logger.verbose(`Setting moderator status... {userId: ${userId}`);
+    return this.authService.setModeratorStatus(userId);
   }
 
   async updateCredentials(

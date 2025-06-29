@@ -146,13 +146,12 @@ export class AuthService implements AuthServiceInterface {
     }
   }
 
-  // way too simple. will be reworked later
-  async setModeratorStatus(user: User): Promise<void> {
+  async setModeratorStatus(userId: string): Promise<void> {
     try {
-      await this.userRepository.update(user.id, { isModerator: true });
+      await this.userRepository.update(userId, { isModerator: true });
     } catch (error) {
       this.logger.error(
-        `[INTERNAL] Failed to set moderator status {username: ${user.username}}`,
+        `[INTERNAL] Failed to set moderator status {userId: ${userId}}`,
         error.stack,
       );
       throw new InternalServerErrorException();
