@@ -1,14 +1,8 @@
 import { Request, Response } from 'express';
+import { ProductInfoDto } from './dto/product-info.dto';
 
 export interface PaymentServiceInterface {
-  createCheckout(
-    userId: string,
-    productName: string,
-    currency: string,
-    price: number,
-    success_url: string,
-    cancel_url: string,
-  ): Promise<{ url: string }>;
+  createCheckout(productInfoDto: ProductInfoDto): Promise<{ url: string }>;
 
-  handleWebhooks(req: Request, res: Response);
+  handleWebhooks(req: Request, res: Response): Promise<Response>;
 }

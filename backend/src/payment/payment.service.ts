@@ -9,6 +9,7 @@ import { PaymentServiceInterface } from './payment-service.interface';
 import Stripe from 'stripe';
 import { Request, Response } from 'express';
 import { AuthServiceInterface } from 'src/auth/auth-service.interface';
+import { ProductInfoDto } from './dto/product-info.dto';
 
 @Injectable()
 export class PaymentService implements PaymentServiceInterface {
@@ -17,13 +18,10 @@ export class PaymentService implements PaymentServiceInterface {
   private logger = new Logger('PaymentService', { timestamp: true });
 
   async createCheckout(
-    userId: string,
-    productName: string,
-    currency: string,
-    price: number,
-    success_url: string,
-    cancel_url: string,
+    productInfoDto: ProductInfoDto,
   ): Promise<{ url: string }> {
+    const { userId, productName, currency, price, success_url, cancel_url } =
+      productInfoDto;
     try {
       const session = await this.stripe.checkout.sessions.create({
         payment_method_types: ['card'],
@@ -49,14 +47,14 @@ export class PaymentService implements PaymentServiceInterface {
       return { url: session.url! };
     } catch (error) {
       this.logger.error(
-        `[INTERNAL] Failed to create a checkout {userId: ${userId}}`,
+        `[INTERNAL] Failed to create a checkout {userId: ${userId}, product: ${productName}}`,
         error.stack,
       );
       throw new InternalServerErrorException();
     }
   }
 
-  async handleWebhooks(req: Request, res: Response) {
+  async handleWebhooks(req: Request, res: Response): Promise<Response> {
     const sig = req.headers['stripe-signature'];
     let event;
 
@@ -66,9 +64,11 @@ export class PaymentService implements PaymentServiceInterface {
         sig!,
         process.env.STRIPE_WEBHOOK_KEY!,
       );
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      (req as any).stripeEvent = event;
     } catch (error) {
       this.logger.error('[INTERNAL] Failed to handle a webhook', error.stack);
-      return res.status(400).send(`Webhook Error: ${error.message}`);
+      return res.status(500).send(`Webhook Error: ${error.message}`);
     }
 
     if (event.type === 'checkout.session.completed') {
@@ -78,7 +78,6 @@ export class PaymentService implements PaymentServiceInterface {
       const product = session.metadata?.product;
 
       if (product === 'Moderator Status' && userId) {
-        this.logger.verbose(`Payment complete {userId : ${userId}}`);
         await this.authService.setModeratorStatus(userId);
       }
     }

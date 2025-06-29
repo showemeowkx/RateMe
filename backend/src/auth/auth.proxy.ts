@@ -57,7 +57,7 @@ export class AuthProxy implements AuthServiceInterface {
 
   async setModeratorStatus(userId: string): Promise<void> {
     this.cache.flushAll();
-    this.logger.verbose(`Setting moderator status... {userId: ${userId}`);
+    this.logger.verbose(`Setting moderator status... {userId: ${userId}}`);
     return this.authService.setModeratorStatus(userId);
   }
 
