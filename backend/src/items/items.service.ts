@@ -38,7 +38,9 @@ export class ItemsService implements ItemsServiceInterface {
   ): Promise<PaginationDto<Item>> {
     const { category, name, minRating, maxRating } = filterDto;
 
-    const query = this.itemsRepository.createQueryBuilder('item');
+    const query = this.itemsRepository
+      .createQueryBuilder('item')
+      .innerJoin('item.reviews', 'review');
 
     if (category) {
       const categoryEntity = await this.categoriesService.getCategories({
