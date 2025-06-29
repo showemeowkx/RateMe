@@ -7,13 +7,9 @@ RateMe is a web application that allows users to track and leave reviews for dif
 ## ✅ Features
 
 - Product listing and search
-
 - User authentication & review submission
-
 - Review rating system
-
 - Data analysis on review trends
-
 - Responsive UI with React
 
 ## 🚀 Getting Started
@@ -23,10 +19,9 @@ RateMe is a web application that allows users to track and leave reviews for dif
 Ensure you have the following installed:
 
 - Node.js and npm
-
 - Docker, Docker Compose
-
 - Python 3.10.11
+- Stripe CLI ([instalation guide](https://docs.stripe.com/stripe-cli))
 
 2️⃣ Installation
 
@@ -37,9 +32,22 @@ git clone https://github.com/showemeowkx/RateMe.git
 cd rate-me
 ```
 
-Create an environment file
+Create an environment file in the root directory (`./.env`)
 
-Edit `.env` and update any required values (e.g., DB credentials, ports).
+Log in to Stripe CLI and connect to webhooks
+
+```bash
+stripe login
+stripe listen -f http://host:port/payments/webhooks
+```
+
+Copy the generated key and pass it to the `.env` file
+
+```bash
+STRIPE_WEBHOOK_KEY=whsec_YOUR_KEY
+```
+
+Add other required values to the `.env` file (e.g., DB credentials, ports)
 
 Build the Docker images
 
