@@ -17,7 +17,7 @@ export interface AuthServiceInterface {
     authSignInCredDto: AuthSignInCredDto,
   ): Promise<{ accessToken: string }>;
 
-  setModeratorStatus(user: User): Promise<void>;
+  setModeratorStatus(userId: string): Promise<void>;
 
   updateCredentials(
     user: User,

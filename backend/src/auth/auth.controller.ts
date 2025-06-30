@@ -59,12 +59,6 @@ export class AuthController {
     return this.authService.signIn(authSignInCredDto);
   }
 
-  @Patch('/moderator')
-  @UseGuards(AuthGuard())
-  setModeratorStatus(@GetUser() user: User): Promise<void> {
-    return this.authService.setModeratorStatus(user);
-  }
-
   @Patch('/update-credentials')
   @UseGuards(AuthGuard())
   @UseInterceptors(
