@@ -2,7 +2,7 @@
 
 ## 🚀 Overview
 
-RateMe is a web application that allows users to track and leave reviews for different products. Users can browse products, submit reviews, and analyze review trends using data analytics.
+RateMe is a web application that allows users to track and leave reviews for different products. Users can browse and add products, submit and analyze reviews using data analytics.
 
 ## ✅ Features
 
