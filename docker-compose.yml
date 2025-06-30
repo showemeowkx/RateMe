@@ -35,6 +35,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./frontend/public/uploads:/app/uploads
+      - ./backend/src/payment/logs:/app/logs
 
   database:
     image: postgres:latest
