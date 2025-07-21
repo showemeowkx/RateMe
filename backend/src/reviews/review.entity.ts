@@ -25,4 +25,7 @@ export class Review {
 
   @Column()
   text: string;
+
+  @Column()
+  isPositive: boolean;
 }

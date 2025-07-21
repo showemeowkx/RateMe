@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
   ConflictException,
@@ -21,6 +20,7 @@ import { ReviewsServiceInterface } from './reviews-service.interface';
 import { AuthServiceInterface } from 'src/auth/auth-service.interface';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { AnalyzeReviewDto } from './dto/analyze-review.dto';
 
 @Injectable()
 export class ReviewsService implements ReviewsServiceInterface {
@@ -31,6 +31,12 @@ export class ReviewsService implements ReviewsServiceInterface {
     @Inject('ITEMS_SERVICE') private itemsService: ItemsServiceInterface,
     private httpService: HttpService,
   ) {}
+
+  private MODEL_URL: string = `http://${
+    process.env.NODE_ENV === 'production'
+      ? process.env.MODEL_HOST_PROD
+      : process.env.MODEL_HOST_DEV
+  }:${process.env.MODEL_PORT}`;
 
   async getReviewsByItem(
     itemId: string,
@@ -102,6 +108,15 @@ export class ReviewsService implements ReviewsServiceInterface {
     const likedChecked = liked ? liked : 'Не визначено';
     const dislikedChecked = disliked ? disliked : 'Не визначено';
 
+    const reviewData: AnalyzeReviewDto = {
+      experience: usePeriod.toLowerCase(),
+      liked: likedChecked,
+      disliked: dislikedChecked,
+      comment: text,
+    };
+
+    const isPositive = await this.analyzeReview(reviewData);
+
     const review = this.reviewRepository.create({
       item: item,
       author: user,
@@ -109,48 +124,48 @@ export class ReviewsService implements ReviewsServiceInterface {
       liked: likedChecked,
       disliked: dislikedChecked,
       text,
+      isPositive,
     });
 
     try {
       await this.reviewRepository.save(review).then(async () => {
-        const reviewData = {
-          experience: usePeriod.toLowerCase(),
-          liked: likedChecked,
-          disliked: dislikedChecked,
-          comment: text,
-        };
-
-        try {
-          const host =
-            process.env.NODE_ENV === 'production'
-              ? process.env.MODEL_HOST_PROD
-              : process.env.MODEL_HOST_DEV;
-          const port = process.env.MODEL_PORT;
-
-          const response = await firstValueFrom(
-            this.httpService.post(`http://${host}:${port}`, reviewData),
-          );
-          this.logger.verbose(
-            `Received from model: ${JSON.stringify(response.data)}`,
-          );
-          await this.itemsService.updateRating(itemId, response.data);
-        } catch (error) {
-          this.logger.error('[MODEL] Failed to analyze a review', error.stack);
-          await this.deleteReview(review.id);
-          throw new Error(error.message);
-        }
+        await this.itemsService.updateItem(itemId);
       });
     } catch (error) {
       this.logger.error(
-        `[INTERNAL] Failed to create a review {item: ${item.name}, user: ${user.username}}`,
+        `[INTERNAL] Failed to create a review {user: ${user.username}, itemId: ${itemId}}`,
         error.stack,
       );
       throw new InternalServerErrorException();
     }
   }
 
+  async analyzeReview(analyzeReviewDto: AnalyzeReviewDto): Promise<boolean> {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.post<{ isRecommended: 0 | 1 }>(
+          this.MODEL_URL,
+          analyzeReviewDto,
+        ),
+      );
+      const responseData = response.data;
+      const isPositive = responseData.isRecommended === 1;
+      this.logger.verbose(
+        `Received from model: ${JSON.stringify(responseData)}`,
+      );
+      return isPositive;
+    } catch (error) {
+      this.logger.error('[MODEL] Failed to analyze a review', error.stack);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async deleteReview(reviewId: string): Promise<void> {
-    const review = await this.reviewRepository.findOneBy({ id: reviewId });
+    const review = await this.reviewRepository.findOne({
+      where: { id: reviewId },
+      relations: ['item'],
+      select: { item: { id: true } },
+    });
 
     if (!review) {
       this.logger.error(
@@ -162,7 +177,10 @@ export class ReviewsService implements ReviewsServiceInterface {
     }
 
     try {
-      await this.reviewRepository.remove(review);
+      const itemId = review.item.id;
+      await this.reviewRepository
+        .remove(review)
+        .then(async () => this.itemsService.updateItem(itemId));
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to delete a review {reviewId: ${reviewId}}`,

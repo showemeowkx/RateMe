@@ -21,6 +21,7 @@ import { ItemsServiceInterface } from './items-service.interfase';
 import { CategoriesServiceIInterface } from 'src/categories/categories-service.interface';
 import { SortItemsDto } from './dto/sort-items.dto';
 import { getPrimaryPath, getRealPath } from 'src/common/file-upload';
+import { Review } from 'src/reviews/review.entity';
 
 @Injectable()
 export class ItemsService implements ItemsServiceInterface {
@@ -151,6 +152,8 @@ export class ItemsService implements ItemsServiceInterface {
       name,
       description,
       rating: 0,
+      reviewsQty: 0,
+      positiveReviewsQty: 0,
     });
 
     try {
@@ -172,29 +175,53 @@ export class ItemsService implements ItemsServiceInterface {
     }
   }
 
-  async updateRating(
-    itemId: string,
-    status: { isRecommended: 0 | 1 },
-  ): Promise<void> {
+  async updateItem(itemId: string): Promise<void> {
     const item = await this.getItemById(itemId);
-    const { isRecommended } = status;
     try {
-      const reviewAmount = item.reviews.length;
-      const positiveReviews = (item.rating * (reviewAmount - 1)) / 100;
-      const newRating =
-        ((positiveReviews + isRecommended) / reviewAmount) * 100;
+      const reviews = item.reviews;
+      const reviewsQty = reviews.length;
+      const positiveReviewsQty = reviews.filter(
+        (review: Review) => review.isPositive,
+      ).length;
+      const newRating = (positiveReviewsQty / reviewsQty) * 100;
 
       await this.itemsRepository.update(itemId, {
+        reviewsQty,
+        positiveReviewsQty,
         rating: parseFloat(newRating.toFixed(2)),
       });
     } catch (error) {
       this.logger.error(
-        `[INTERNAL] Failed to update rating {itemId: ${itemId}}`,
+        `[INTERNAL] Failed to update an item {itemId: ${itemId}}`,
         error.stack,
       );
       throw new InternalServerErrorException();
     }
   }
+
+  // async updateRating(
+  //   itemId: string,
+  //   status: { isRecommended: 0 | 1 },
+  // ): Promise<void> {
+  //   const item = await this.getItemById(itemId);
+  //   const { isRecommended } = status;
+  //   try {
+  //     const reviewAmount = item.reviews.length;
+  //     const positiveReviews = (item.rating * (reviewAmount - 1)) / 100;
+  //     const newRating =
+  //       ((positiveReviews + isRecommended) / reviewAmount) * 100;
+
+  //     await this.itemsRepository.update(itemId, {
+  //       rating: parseFloat(newRating.toFixed(2)),
+  //     });
+  //   } catch (error) {
+  //     this.logger.error(
+  //       `[INTERNAL] Failed to update rating {itemId: ${itemId}}`,
+  //       error.stack,
+  //     );
+  //     throw new InternalServerErrorException();
+  //   }
+  // }
 
   async deleteItem(itemId: string): Promise<void> {
     const item = await this.getItemById(itemId);

@@ -21,7 +21,7 @@ export interface ItemsServiceInterface {
     file: Express.Multer.File,
   ): Promise<{ itemId: string }>;
 
-  updateRating(itemId: string, status: { isRecommended: 0 | 1 }): Promise<void>;
+  updateItem(itemId: string): Promise<void>;
 
   deleteItem(itemId: string): Promise<void>;
 }
