@@ -19,7 +19,7 @@ export class User {
   @Column()
   name: string;
 
-  @Column({ select: false })
+  @Column()
   password: string;
 
   @OneToMany(() => Item, (item) => item.creator, {
