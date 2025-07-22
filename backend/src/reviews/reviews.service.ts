@@ -129,7 +129,12 @@ export class ReviewsService implements ReviewsServiceInterface {
 
     try {
       await this.reviewRepository.save(review).then(async () => {
-        await this.itemsService.updateItem(itemId);
+        const paginationDto = { page: 1, limit: Number.MAX_SAFE_INTEGER };
+        await this.getReviewsByItem(itemId, paginationDto).then(
+          async (itemReviews) => {
+            await this.itemsService.updateItem(itemId, itemReviews.items);
+          },
+        );
       });
     } catch (error) {
       this.logger.error(
@@ -178,9 +183,14 @@ export class ReviewsService implements ReviewsServiceInterface {
 
     try {
       const itemId = review.item.id;
-      await this.reviewRepository
-        .remove(review)
-        .then(async () => this.itemsService.updateItem(itemId));
+      await this.reviewRepository.remove(review).then(async () => {
+        const paginationDto = { page: 1, limit: Number.MAX_SAFE_INTEGER };
+        await this.getReviewsByItem(itemId, paginationDto).then(
+          async (itemReviews) => {
+            await this.itemsService.updateItem(itemId, itemReviews.items);
+          },
+        );
+      });
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to delete a review {reviewId: ${reviewId}}`,

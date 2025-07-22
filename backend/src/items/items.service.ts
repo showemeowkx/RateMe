@@ -39,9 +39,7 @@ export class ItemsService implements ItemsServiceInterface {
   ): Promise<PaginationDto<Item>> {
     const { category, name, minRating, maxRating } = filterDto;
 
-    const query = this.itemsRepository
-      .createQueryBuilder('item')
-      .innerJoin('item.reviews', 'review');
+    const query = this.itemsRepository.createQueryBuilder('item');
 
     if (category) {
       const categoryEntity = await this.categoriesService.getCategories({
@@ -73,7 +71,11 @@ export class ItemsService implements ItemsServiceInterface {
         'item.imagePath',
         'item.name',
         'item.rating',
-        'category',
+        'item.reviewsQty',
+        'item.positiveReviewsQty',
+        'category.id',
+        'category.slug',
+        'category.name',
       ]);
 
     if (sortingDto.sorting) {
@@ -102,10 +104,23 @@ export class ItemsService implements ItemsServiceInterface {
   }
 
   async getItemById(itemId: string): Promise<Item> {
-    const item = await this.itemsRepository.findOne({
-      where: { id: itemId },
-      relations: ['reviews', 'reviews.author', 'category'],
-    });
+    const item = await this.itemsRepository
+      .createQueryBuilder('item')
+      .leftJoinAndSelect('item.category', 'category')
+      .where('item.id = :itemId', { itemId })
+      .select([
+        'item.id',
+        'item.imagePath',
+        'item.name',
+        'item.description',
+        'item.rating',
+        'item.reviewsQty',
+        'item.positiveReviewsQty',
+        'category.id',
+        'category.name',
+        'category.slug',
+      ])
+      .getOne();
 
     if (!item) {
       this.logger.error(
@@ -175,12 +190,12 @@ export class ItemsService implements ItemsServiceInterface {
     }
   }
 
-  async updateItem(itemId: string): Promise<void> {
-    const item = await this.getItemById(itemId);
+  async updateItem(itemId: string, itemReviews: Review[]): Promise<void> {
+    await this.getItemById(itemId);
+
     try {
-      const reviews = item.reviews;
-      const reviewsQty = reviews.length;
-      const positiveReviewsQty = reviews.filter(
+      const reviewsQty = itemReviews.length;
+      const positiveReviewsQty = itemReviews.filter(
         (review: Review) => review.isPositive,
       ).length;
       const newRating = (positiveReviewsQty / reviewsQty) * 100;
@@ -198,30 +213,6 @@ export class ItemsService implements ItemsServiceInterface {
       throw new InternalServerErrorException();
     }
   }
-
-  // async updateRating(
-  //   itemId: string,
-  //   status: { isRecommended: 0 | 1 },
-  // ): Promise<void> {
-  //   const item = await this.getItemById(itemId);
-  //   const { isRecommended } = status;
-  //   try {
-  //     const reviewAmount = item.reviews.length;
-  //     const positiveReviews = (item.rating * (reviewAmount - 1)) / 100;
-  //     const newRating =
-  //       ((positiveReviews + isRecommended) / reviewAmount) * 100;
-
-  //     await this.itemsRepository.update(itemId, {
-  //       rating: parseFloat(newRating.toFixed(2)),
-  //     });
-  //   } catch (error) {
-  //     this.logger.error(
-  //       `[INTERNAL] Failed to update rating {itemId: ${itemId}}`,
-  //       error.stack,
-  //     );
-  //     throw new InternalServerErrorException();
-  //   }
-  // }
 
   async deleteItem(itemId: string): Promise<void> {
     const item = await this.getItemById(itemId);
