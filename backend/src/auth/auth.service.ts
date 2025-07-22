@@ -53,9 +53,13 @@ export class AuthService implements AuthServiceInterface {
       });
     }
 
-    query
-      .leftJoinAndSelect('user.reviews', 'reviews')
-      .leftJoinAndSelect('user.items', 'items');
+    query.select([
+      'user.id',
+      'user.imagePath',
+      'user.username',
+      'user.name',
+      'user.isModerator',
+    ]);
 
     try {
       return await query.getMany();
@@ -69,10 +73,28 @@ export class AuthService implements AuthServiceInterface {
   }
 
   async getUserById(userId: string): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['reviews', 'items'],
-    });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.items', 'items')
+      .leftJoinAndSelect('user.reviews', 'reviews')
+      .leftJoinAndSelect('reviews.item', 'reviewItem')
+      .where('user.id = :userId', { userId })
+      .select([
+        'user.id',
+        'user.username',
+        'user.name',
+        'user.imagePath',
+        'user.isModerator',
+        'items.id',
+        'items.imagePath',
+        'items.name',
+        'reviews.id',
+        'reviews.isPositive',
+        'reviewItem.id',
+        'reviewItem.imagePath',
+        'reviewItem.name',
+      ])
+      .getOne();
 
     if (!user) {
       this.logger.error(
@@ -193,10 +215,10 @@ export class AuthService implements AuthServiceInterface {
     cred: 'username' | 'email',
   ): Promise<string> {
     if (value === originalValue) {
+      this.logger.error(
+        `[SAME INPUT] Failed to update credentials {${cred}: ${originalValue}}}`,
+      );
       throw new ConflictException(
-        this.logger.error(
-          `[SAME INPUT] Failed to update credentials {${cred}: ${originalValue}}}`,
-        ),
         `New ${cred} must be different from current one`,
       );
     }
