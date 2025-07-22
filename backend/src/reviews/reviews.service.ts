@@ -48,7 +48,20 @@ export class ReviewsService implements ReviewsServiceInterface {
       const query = this.reviewRepository
         .createQueryBuilder('review')
         .leftJoinAndSelect('review.author', 'author')
-        .where('review.item.id = :itemId', { itemId });
+        .where('review.item.id = :itemId', { itemId })
+        .select([
+          'review.id',
+          'review.usePeriod',
+          'review.liked',
+          'review.disliked',
+          'review.text',
+          'review.isPositive',
+          'author.id',
+          'author.imagePath',
+          'author.name',
+          'author.username',
+          'author.isModerator',
+        ]);
 
       return paginate(query, pagination.page, pagination.limit);
     } catch (error) {
@@ -70,7 +83,18 @@ export class ReviewsService implements ReviewsServiceInterface {
       const query = this.reviewRepository
         .createQueryBuilder('review')
         .leftJoinAndSelect('review.item', 'item')
-        .where('review.author.id = :userId', { userId });
+        .where('review.author.id = :userId', { userId })
+        .select([
+          'review.id',
+          'review.usePeriod',
+          'review.liked',
+          'review.disliked',
+          'review.text',
+          'review.isPositive',
+          'item.id',
+          'item.imagePath',
+          'item.name',
+        ]);
 
       return paginate(query, pagination.page, pagination.limit);
     } catch (error) {
@@ -95,6 +119,7 @@ export class ReviewsService implements ReviewsServiceInterface {
     const sameReview = reviews.find((review) => review.item.id === itemId);
 
     if (sameReview) {
+      console.log(sameReview);
       this.logger.error(
         `[ALREADY EXISTS] Failed to create a review {user: ${user.username}, itemId: ${itemId}}`,
       );
@@ -129,7 +154,12 @@ export class ReviewsService implements ReviewsServiceInterface {
 
     try {
       await this.reviewRepository.save(review).then(async () => {
-        await this.itemsService.updateItem(itemId);
+        const paginationDto = { page: 1, limit: Number.MAX_SAFE_INTEGER };
+        await this.getReviewsByItem(itemId, paginationDto).then(
+          async (itemReviews) => {
+            await this.itemsService.updateItem(itemId, itemReviews.items);
+          },
+        );
       });
     } catch (error) {
       this.logger.error(
@@ -178,9 +208,14 @@ export class ReviewsService implements ReviewsServiceInterface {
 
     try {
       const itemId = review.item.id;
-      await this.reviewRepository
-        .remove(review)
-        .then(async () => this.itemsService.updateItem(itemId));
+      await this.reviewRepository.remove(review).then(async () => {
+        const paginationDto = { page: 1, limit: Number.MAX_SAFE_INTEGER };
+        await this.getReviewsByItem(itemId, paginationDto).then(
+          async (itemReviews) => {
+            await this.itemsService.updateItem(itemId, itemReviews.items);
+          },
+        );
+      });
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to delete a review {reviewId: ${reviewId}}`,
