@@ -9,6 +9,7 @@ import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { ItemsServiceInterface } from './items-service.interfase';
 import * as NodeCache from 'node-cache';
 import { SortItemsDto } from './dto/sort-items.dto';
+import { Review } from 'src/reviews/review.entity';
 
 @Injectable()
 export class ItemsProxy implements ItemsServiceInterface {
@@ -63,6 +64,12 @@ export class ItemsProxy implements ItemsServiceInterface {
     this.cache.flushAll();
     this.logger.verbose(`Adding item... {name: ${addItemDto.name}}`);
     return this.itemsService.addItem(addItemDto, user, file);
+  }
+
+  async updateItem(itemId: string, itemReviews: Review[]): Promise<void> {
+    this.cache.flushAll();
+    this.logger.verbose(`Updating an item... {itemId: ${itemId}}`);
+    return this.itemsService.updateItem(itemId, itemReviews);
   }
 
   async deleteItem(itemId: string): Promise<void> {

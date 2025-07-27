@@ -21,6 +21,7 @@ import { ItemsServiceInterface } from './items-service.interfase';
 import { CategoriesServiceIInterface } from 'src/categories/categories-service.interface';
 import { SortItemsDto } from './dto/sort-items.dto';
 import { getPrimaryPath, getRealPath } from 'src/common/file-upload';
+import { Review } from 'src/reviews/review.entity';
 
 @Injectable()
 export class ItemsService implements ItemsServiceInterface {
@@ -70,7 +71,11 @@ export class ItemsService implements ItemsServiceInterface {
         'item.imagePath',
         'item.name',
         'item.rating',
-        'category',
+        'item.reviewsQty',
+        'item.positiveReviewsQty',
+        'category.id',
+        'category.slug',
+        'category.name',
       ]);
 
     if (sortingDto.sorting) {
@@ -99,10 +104,23 @@ export class ItemsService implements ItemsServiceInterface {
   }
 
   async getItemById(itemId: string): Promise<Item> {
-    const item = await this.itemsRepository.findOne({
-      where: { id: itemId },
-      relations: ['reviews', 'reviews.author', 'category'],
-    });
+    const item = await this.itemsRepository
+      .createQueryBuilder('item')
+      .leftJoinAndSelect('item.category', 'category')
+      .where('item.id = :itemId', { itemId })
+      .select([
+        'item.id',
+        'item.imagePath',
+        'item.name',
+        'item.description',
+        'item.rating',
+        'item.reviewsQty',
+        'item.positiveReviewsQty',
+        'category.id',
+        'category.name',
+        'category.slug',
+      ])
+      .getOne();
 
     if (!item) {
       this.logger.error(
@@ -149,6 +167,8 @@ export class ItemsService implements ItemsServiceInterface {
       name,
       description,
       rating: 0,
+      reviewsQty: 0,
+      positiveReviewsQty: 0,
     });
 
     try {
@@ -164,6 +184,30 @@ export class ItemsService implements ItemsServiceInterface {
       }
       this.logger.error(
         `[INTERNAL] Failed to add an item {name: ${name}}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
+  }
+
+  async updateItem(itemId: string, itemReviews: Review[]): Promise<void> {
+    await this.getItemById(itemId);
+
+    try {
+      const reviewsQty = itemReviews.length;
+      const positiveReviewsQty = itemReviews.filter(
+        (review: Review) => review.isPositive,
+      ).length;
+      const newRating = (positiveReviewsQty / reviewsQty) * 100;
+
+      await this.itemsRepository.update(itemId, {
+        reviewsQty,
+        positiveReviewsQty,
+        rating: parseFloat(newRating.toFixed(2)),
+      });
+    } catch (error) {
+      this.logger.error(
+        `[INTERNAL] Failed to update an item {itemId: ${itemId}}`,
         error.stack,
       );
       throw new InternalServerErrorException();

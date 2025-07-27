@@ -18,6 +18,9 @@ import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { ItemsServiceInterface } from 'src/items/items-service.interfase';
 import { ReviewsServiceInterface } from './reviews-service.interface';
 import { AuthServiceInterface } from 'src/auth/auth-service.interface';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
+import { AnalyzeReviewDto } from './dto/analyze-review.dto';
 
 @Injectable()
 export class ReviewsService implements ReviewsServiceInterface {
@@ -26,7 +29,14 @@ export class ReviewsService implements ReviewsServiceInterface {
     @InjectRepository(Review) private reviewRepository: Repository<Review>,
     @Inject('AUTH_SERVICE') private authService: AuthServiceInterface,
     @Inject('ITEMS_SERVICE') private itemsService: ItemsServiceInterface,
+    private httpService: HttpService,
   ) {}
+
+  private MODEL_URL: string = `http://${
+    process.env.NODE_ENV === 'production'
+      ? process.env.MODEL_HOST_PROD
+      : process.env.MODEL_HOST_DEV
+  }:${process.env.MODEL_PORT}`;
 
   async getReviewsByItem(
     itemId: string,
@@ -38,7 +48,20 @@ export class ReviewsService implements ReviewsServiceInterface {
       const query = this.reviewRepository
         .createQueryBuilder('review')
         .leftJoinAndSelect('review.author', 'author')
-        .where('review.item.id = :itemId', { itemId });
+        .where('review.item.id = :itemId', { itemId })
+        .select([
+          'review.id',
+          'review.usePeriod',
+          'review.liked',
+          'review.disliked',
+          'review.text',
+          'review.isPositive',
+          'author.id',
+          'author.imagePath',
+          'author.name',
+          'author.username',
+          'author.isModerator',
+        ]);
 
       return paginate(query, pagination.page, pagination.limit);
     } catch (error) {
@@ -60,7 +83,18 @@ export class ReviewsService implements ReviewsServiceInterface {
       const query = this.reviewRepository
         .createQueryBuilder('review')
         .leftJoinAndSelect('review.item', 'item')
-        .where('review.author.id = :userId', { userId });
+        .where('review.author.id = :userId', { userId })
+        .select([
+          'review.id',
+          'review.usePeriod',
+          'review.liked',
+          'review.disliked',
+          'review.text',
+          'review.isPositive',
+          'item.id',
+          'item.imagePath',
+          'item.name',
+        ]);
 
       return paginate(query, pagination.page, pagination.limit);
     } catch (error) {
@@ -85,6 +119,7 @@ export class ReviewsService implements ReviewsServiceInterface {
     const sameReview = reviews.find((review) => review.item.id === itemId);
 
     if (sameReview) {
+      console.log(sameReview);
       this.logger.error(
         `[ALREADY EXISTS] Failed to create a review {user: ${user.username}, itemId: ${itemId}}`,
       );
@@ -94,11 +129,18 @@ export class ReviewsService implements ReviewsServiceInterface {
     }
 
     const item = await this.itemsService.getItemById(itemId);
-
     const { usePeriod, liked, disliked, text } = createReviewDto;
+    const likedChecked = liked ? liked : 'Не визначено';
+    const dislikedChecked = disliked ? disliked : 'Не визначено';
 
-    const likedChecked = liked ? liked : 'Not defined';
-    const dislikedChecked = disliked ? disliked : 'Not defined';
+    const reviewData: AnalyzeReviewDto = {
+      experience: usePeriod.toLowerCase(),
+      liked: likedChecked,
+      disliked: dislikedChecked,
+      comment: text,
+    };
+
+    const isPositive = await this.analyzeReview(reviewData);
 
     const review = this.reviewRepository.create({
       item: item,
@@ -107,22 +149,53 @@ export class ReviewsService implements ReviewsServiceInterface {
       liked: likedChecked,
       disliked: dislikedChecked,
       text,
+      isPositive,
     });
 
     try {
-      await this.reviewRepository.save(review);
+      await this.reviewRepository.save(review).then(async () => {
+        const paginationDto = { page: 1, limit: Number.MAX_SAFE_INTEGER };
+        await this.getReviewsByItem(itemId, paginationDto).then(
+          async (itemReviews) => {
+            await this.itemsService.updateItem(itemId, itemReviews.items);
+          },
+        );
+      });
     } catch (error) {
       this.logger.error(
-        `[INTERNAL] Failed to create a review {item: ${item.name}, user: ${user.username}}`,
-
+        `[INTERNAL] Failed to create a review {user: ${user.username}, itemId: ${itemId}}`,
         error.stack,
       );
       throw new InternalServerErrorException();
     }
   }
 
+  async analyzeReview(analyzeReviewDto: AnalyzeReviewDto): Promise<boolean> {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.post<{ isRecommended: 0 | 1 }>(
+          this.MODEL_URL,
+          analyzeReviewDto,
+        ),
+      );
+      const responseData = response.data;
+      const isPositive = responseData.isRecommended === 1;
+      this.logger.verbose(
+        `Received from model: ${JSON.stringify(responseData)}`,
+      );
+      return isPositive;
+    } catch (error) {
+      this.logger.error('[MODEL] Failed to analyze a review', error.stack);
+      throw new InternalServerErrorException(error.message);
+    }
+  }
+
   async deleteReview(reviewId: string): Promise<void> {
-    const review = await this.reviewRepository.findOneBy({ id: reviewId });
+    const review = await this.reviewRepository.findOne({
+      where: { id: reviewId },
+      relations: ['item'],
+      select: { item: { id: true } },
+    });
 
     if (!review) {
       this.logger.error(
@@ -134,7 +207,15 @@ export class ReviewsService implements ReviewsServiceInterface {
     }
 
     try {
-      await this.reviewRepository.remove(review);
+      const itemId = review.item.id;
+      await this.reviewRepository.remove(review).then(async () => {
+        const paginationDto = { page: 1, limit: Number.MAX_SAFE_INTEGER };
+        await this.getReviewsByItem(itemId, paginationDto).then(
+          async (itemReviews) => {
+            await this.itemsService.updateItem(itemId, itemReviews.items);
+          },
+        );
+      });
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to delete a review {reviewId: ${reviewId}}`,

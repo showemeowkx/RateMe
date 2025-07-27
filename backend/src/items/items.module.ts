@@ -3,10 +3,10 @@ import { ItemsController } from './items.controller';
 import { ItemsService } from './items.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Item } from './item.entity';
-import { AuthModule } from 'src/auth/auth.module';
 import { NestjsFormDataModule } from 'nestjs-form-data';
 import { CategoriesModule } from 'src/categories/categories.module';
 import { ItemsProxy } from './items.proxy';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [

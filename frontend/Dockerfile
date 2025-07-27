@@ -6,6 +6,6 @@ RUN npm install
 
 COPY . .
 
-EXPOSE 3000
+EXPOSE ${FRONT_PORT}
 
 CMD ["npm", "run", "start"]

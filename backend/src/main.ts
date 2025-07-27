@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import * as bodyParser from 'body-parser';
 
 async function bootstrap() {
   const logger = new Logger();
@@ -15,6 +16,8 @@ async function bootstrap() {
     origin: `http://localhost:${process.env.FRONT_PORT ?? '3000'}`,
     credentials: true,
   });
+
+  app.use('/payments/webhooks', bodyParser.raw({ type: 'application/json' }));
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 

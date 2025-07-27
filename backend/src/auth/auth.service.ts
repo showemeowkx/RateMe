@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import {
-  BadRequestException,
   ConflictException,
   Injectable,
   InternalServerErrorException,
@@ -54,9 +53,13 @@ export class AuthService implements AuthServiceInterface {
       });
     }
 
-    query
-      .leftJoinAndSelect('user.reviews', 'reviews')
-      .leftJoinAndSelect('user.items', 'items');
+    query.select([
+      'user.id',
+      'user.imagePath',
+      'user.username',
+      'user.name',
+      'user.isModerator',
+    ]);
 
     try {
       return await query.getMany();
@@ -70,10 +73,28 @@ export class AuthService implements AuthServiceInterface {
   }
 
   async getUserById(userId: string): Promise<User> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['reviews', 'items'],
-    });
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.items', 'items')
+      .leftJoinAndSelect('user.reviews', 'reviews')
+      .leftJoinAndSelect('reviews.item', 'reviewItem')
+      .where('user.id = :userId', { userId })
+      .select([
+        'user.id',
+        'user.username',
+        'user.name',
+        'user.imagePath',
+        'user.isModerator',
+        'items.id',
+        'items.imagePath',
+        'items.name',
+        'reviews.id',
+        'reviews.isPositive',
+        'reviewItem.id',
+        'reviewItem.imagePath',
+        'reviewItem.name',
+      ])
+      .getOne();
 
     if (!user) {
       this.logger.error(
@@ -97,8 +118,8 @@ export class AuthService implements AuthServiceInterface {
     }
   }
 
-  async createUser(authSignInCredDto: AuthSignUpCredDto): Promise<void> {
-    const { name, surname, username, email, password } = authSignInCredDto;
+  async createUser(authSignUpCredDto: AuthSignUpCredDto): Promise<void> {
+    const { name, surname, username, email, password } = authSignUpCredDto;
 
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(password, salt);
@@ -147,6 +168,18 @@ export class AuthService implements AuthServiceInterface {
     }
   }
 
+  async setModeratorStatus(userId: string): Promise<void> {
+    try {
+      await this.userRepository.update(userId, { isModerator: true });
+    } catch (error) {
+      this.logger.error(
+        `[INTERNAL] Failed to set moderator status {userId: ${userId}}`,
+        error.stack,
+      );
+      throw new InternalServerErrorException();
+    }
+  }
+
   async updatePfp(user: User, file: Express.Multer.File): Promise<void> {
     const oldImagePath = user.imagePath;
     const newImagePath = file?.path;
@@ -176,73 +209,78 @@ export class AuthService implements AuthServiceInterface {
     }
   }
 
-  // way too simple. will be reworked later
-  async setModeratorStatus(user: User): Promise<void> {
-    try {
-      await this.userRepository.update(user.id, { isModerator: true });
-    } catch (error) {
+  async checkLogin(
+    value: string,
+    originalValue: string,
+    cred: 'username' | 'email',
+  ): Promise<string> {
+    if (value === originalValue) {
       this.logger.error(
-        `[INTERNAL] Failed to set moderator status {username: ${user.username}}`,
-        error.stack,
+        `[SAME INPUT] Failed to update credentials {${cred}: ${originalValue}}}`,
       );
-      throw new InternalServerErrorException();
+      throw new ConflictException(
+        `New ${cred} must be different from current one`,
+      );
     }
+
+    const sameUsers = await this.getUsers({ [cred]: value });
+    for (const sameUser of sameUsers) {
+      if (sameUser[cred] === value) {
+        this.logger.error(
+          `[ALREADY EXISTS] Failed to update credentials {${cred}: ${originalValue}}`,
+        );
+        throw new ConflictException(`This ${cred} is already taken`);
+      }
+    }
+
+    return value;
   }
 
   async updateCredentials(
     user: User,
     updateCredentialsDto: UpdateCredentialsDto,
+    file: Express.Multer.File,
   ): Promise<{ accessToken }> {
-    const { username, password } = updateCredentialsDto;
-    let credential: 'username' | 'password';
-    let newValue: string;
-    let loginValue: string;
+    const { name, surname, username, password, email } = updateCredentialsDto;
+    let newLogin: string = user.username;
+    let newPassword: string = user.password;
+    let newName: string = user.name;
+
+    if (name) {
+      const nameSplit = newName.split(' ');
+      newName = `${name.trim()} ${nameSplit[1]}`;
+    }
+
+    if (surname) {
+      const nameSplit = newName.split(' ');
+      newName = `${nameSplit[0]} ${surname.trim()}`;
+    }
 
     if (username) {
-      if (username === user.username) {
-        throw new ConflictException(
-          this.logger.error(
-            `[SAME INPUT] Failed to update credentials {username: ${user.username}}`,
-          ),
-          'New username must be different from current one',
-        );
-      }
+      newLogin = await this.checkLogin(username, user.username, 'username');
+    }
 
-      const sameUsers = await this.getUsers({ username: username });
-      for (const sameUser of sameUsers) {
-        if (sameUser.username === username) {
-          this.logger.error(
-            `[ALREADY EXISTS] Failed to update credentials {username: ${user.username}}`,
-          );
-          throw new ConflictException('This username is already taken');
-        }
-      }
-      credential = 'username';
-      newValue = username;
-      loginValue = username;
-    } else if (password) {
-      credential = 'password';
+    if (password) {
       const salt = await bcrypt.genSalt();
-      newValue = await bcrypt.hash(password, salt);
-      loginValue = user.username;
-    } else {
-      this.logger.error(
-        `[WRONG INPUT] Failed to update credentials {username: ${user.username}}`,
-      );
-      throw new BadRequestException('No credentials to update');
+      const hashedPassword = await bcrypt.hash(password, salt);
+      newPassword = hashedPassword;
+    }
+
+    if (email) {
+      newLogin = await this.checkLogin(email, user.email, 'email');
+    }
+
+    if (file) {
+      await this.updatePfp(user, file);
     }
 
     try {
       await this.userRepository.update(user.id, {
-        [credential]: newValue,
+        username: username ?? user.username,
+        email: email ?? user.email,
+        password: newPassword,
+        name: newName,
       });
-
-      const payload: JwtPayload = {
-        login: loginValue,
-        isModerator: user.isModerator,
-      };
-      const accessToken: string = await this.jwtService.signAsync(payload);
-      return { accessToken };
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to update credentials {username: ${user.username}}`,
@@ -250,6 +288,13 @@ export class AuthService implements AuthServiceInterface {
       );
       throw new InternalServerErrorException();
     }
+
+    const payload: JwtPayload = {
+      login: newLogin,
+      isModerator: user.isModerator,
+    };
+    const accessToken: string = await this.jwtService.signAsync(payload);
+    return { accessToken };
   }
 
   async deleteUser(toDelete: string | User): Promise<void> {

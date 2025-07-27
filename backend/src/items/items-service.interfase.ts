@@ -5,6 +5,7 @@ import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { AddItemDto } from './dto/add-item.dto';
 import { User } from 'src/auth/user.entity';
 import { SortItemsDto } from './dto/sort-items.dto';
+import { Review } from 'src/reviews/review.entity';
 
 export interface ItemsServiceInterface {
   getItems(
@@ -20,6 +21,8 @@ export interface ItemsServiceInterface {
     user: User,
     file: Express.Multer.File,
   ): Promise<{ itemId: string }>;
+
+  updateItem(itemId: string, itemReviews: Review[]): Promise<void>;
 
   deleteItem(itemId: string): Promise<void>;
 }
