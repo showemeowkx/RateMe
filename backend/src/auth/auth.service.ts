@@ -83,6 +83,7 @@ export class AuthService implements AuthServiceInterface {
         'user.id',
         'user.username',
         'user.name',
+        'user.email',
         'user.imagePath',
         'user.isModerator',
         'items.id',
