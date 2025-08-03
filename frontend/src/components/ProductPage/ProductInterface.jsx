@@ -41,18 +41,6 @@ export default function ProductInterface() {
           <p className={styles.text}>{product.description}</p>
         </div>
       </div>
-      <div>
-        {product.reviews.length ? (
-          <div>
-            <h1>Відгуки:</h1>
-            <div className={styles.reviews}>
-              <ReviewList product={product} />
-            </div>
-          </div>
-        ) : (
-          <></>
-        )}
-      </div>
     </div>
   );
 }

@@ -3,9 +3,12 @@ import { getProfile } from '../../services/profile/getProfile';
 import HomeButton from '../../components/HomeButton';
 import Loader from '../../components/Loader';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
+import { IoCheckmarkCircle } from 'react-icons/io5';
+import { FaCircleXmark } from 'react-icons/fa6';
 import styles from './Profile.module.css';
 import { Link } from 'react-router-dom';
 import Footer from '../../components/Footer';
+import Switch from './SwitchButton';
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
@@ -19,6 +22,7 @@ export default function Profile() {
   const [showCheckPassword, setShowCheckPassword] = useState(false);
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [showReviews, setShowReviews] = useState(false);
 
   const handleInputChanging = (e) => {
     const { name, value } = e.target;
@@ -69,6 +73,10 @@ export default function Profile() {
         checkPassword &&
         password.trim() !== profile.password &&
         password === checkPassword));
+
+  const handleProfileStatistics = () => {
+    setShowReviews(!showReviews);
+  };
 
   return (
     <div
@@ -187,29 +195,61 @@ export default function Profile() {
                   </div>
                 </form>
               </div>
-              {profile.items && profile.items.length && (
-                <div>
-                  <h2>Створені товари</h2>
-                  <div className={styles.rightSideButtons}>
-                    {profile.items.map((item) => (
-                      <Link
-                        to={`/products/${item.id}`}
-                        key={item.id}
-                        className={styles.itemButton}
-                      >
-                        <div>
-                          <img
-                            src={item.imagePath}
-                            alt={item.name[0]}
-                            className={styles.itemImg}
-                          />
-                        </div>
-                        <div>{item.name}</div>
-                      </Link>
-                    ))}
+              <div>
+                <Switch
+                  isOn={showReviews}
+                  handleToggle={() => setShowReviews(!showReviews)}
+                />
+                {showReviews ? (
+                  <div>
+                    <div className={styles.rightSideButtons}>
+                      {profile.reviews.map((review) => (
+                        <Link
+                          to={`/products/${review.item.id}`}
+                          key={review.id}
+                          className={styles.itemButton}
+                        >
+                          <div className={styles.reviewMark}>
+                            {review.isPositive ? (
+                              <IoCheckmarkCircle />
+                            ) : (
+                              <FaCircleXmark />
+                            )}
+                          </div>
+                          {review.item.name.length > 25
+                            ? `${review.item.name.slice(0, 25)}...`
+                            : review.item.name}{' '}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                ) : (
+                  <div>
+                    <div className={styles.rightSideButtons}>
+                      {profile.items.map((item) => (
+                        <Link
+                          to={`/products/${item.id}`}
+                          key={item.id}
+                          className={styles.itemButton}
+                        >
+                          <div>
+                            <img
+                              src={item.imagePath}
+                              alt={item.name[0]}
+                              className={styles.itemImg}
+                            />
+                          </div>
+                          <div>
+                            {item.name.length > 25
+                              ? `${item.name.slice(0, 25)}...`
+                              : item.name}
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </main>
         )}
