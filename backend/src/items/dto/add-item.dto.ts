@@ -6,7 +6,7 @@ export class AddItemDto {
 
   @IsString()
   @MinLength(5)
-  @MaxLength(50)
+  @MaxLength(150)
   name: string;
 
   @IsNotEmpty()
