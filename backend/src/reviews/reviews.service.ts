@@ -119,7 +119,6 @@ export class ReviewsService implements ReviewsServiceInterface {
     const sameReview = reviews.find((review) => review.item.id === itemId);
 
     if (sameReview) {
-      console.log(sameReview);
       this.logger.error(
         `[ALREADY EXISTS] Failed to create a review {user: ${user.username}, itemId: ${itemId}}`,
       );
