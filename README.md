@@ -61,6 +61,8 @@ Run the app
 docker-compose up
 ```
 
+(Optional) Parse data to get started using [RateMe Parsers](https://github.com/showemeowkx/RateMe-Parsers)
+
 ## 🤝 Contribution Guide
 
 1. Fork the repository
