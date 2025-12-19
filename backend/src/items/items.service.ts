@@ -107,6 +107,8 @@ export class ItemsService implements ItemsServiceInterface {
     const item = await this.itemsRepository
       .createQueryBuilder('item')
       .leftJoinAndSelect('item.category', 'category')
+      .leftJoinAndSelect('item.reviews', 'reviews')
+      .leftJoinAndSelect('reviews.author', 'author')
       .where('item.id = :itemId', { itemId })
       .select([
         'item.id',
@@ -119,6 +121,16 @@ export class ItemsService implements ItemsServiceInterface {
         'category.id',
         'category.name',
         'category.slug',
+        'reviews.id',
+        'reviews.text',
+        'reviews.liked',
+        'reviews.disliked',
+        'reviews.usePeriod',
+        'reviews.isPositive',
+        'author.id',
+        'author.name',
+        'author.username',
+        'author.imagePath',
       ])
       .getOne();
 
