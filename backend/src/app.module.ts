@@ -7,6 +7,8 @@ import { ItemsModule } from './items/items.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { CategoriesModule } from './categories/categories.module';
 import { PaymentModule } from './payment/payment.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -20,7 +22,13 @@ import { PaymentModule } from './payment/payment.module';
       validationSchema: configValidationSchema,
     }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
+      imports: [
+        ConfigModule,
+        ServeStaticModule.forRoot({
+          rootPath: join(__dirname, '..', 'uploads'),
+          serveRoot: '/uploads',
+        }),
+      ],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
         const isProduction = configService.get('NODE_ENV') === 'production';
