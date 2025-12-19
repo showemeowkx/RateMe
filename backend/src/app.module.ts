@@ -23,6 +23,8 @@ import { PaymentModule } from './payment/payment.module';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
+        const isProduction = configService.get('NODE_ENV') === 'production';
+
         return {
           type: 'postgres',
           autoLoadEntities: true,
@@ -34,7 +36,8 @@ import { PaymentModule } from './payment/payment.module';
           port: configService.get('DB_PORT'),
           username: configService.get('DB_USERNAME'),
           password: configService.get('DB_PASSWORD'),
-          database: 'rate-me-postgres',
+          database: configService.get('DB_DATABASE'),
+          ssl: isProduction ? { rejectUnauthorized: false } : false,
         };
       },
     }),
