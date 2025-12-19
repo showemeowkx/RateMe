@@ -1,8 +1,8 @@
-export const URL = 'http://localhost:3001';
+export const URL = process.env.REACT_APP_API_URL || "http://localhost:3001";
 
 export const fetchData = async (
   url,
-  options = { method: 'GET' },
+  options = { method: "GET" },
   result = true
 ) => {
   const response = await fetch(url, options);
@@ -11,7 +11,7 @@ export const fetchData = async (
     const data = await response.json();
     const message = data.message || `Error: ${response.status}`;
 
-    const error = new Error('Validation error');
+    const error = new Error("Validation error");
     error.status = response.status;
     error.message = message;
     throw error;
