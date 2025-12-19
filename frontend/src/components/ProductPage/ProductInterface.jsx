@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { fetchProductById } from '../../services/products/productsFetch';
-import Loader from '../Loader';
-import styles from './ProductInterface.module.css';
-import ReviewList from './ReviewList';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { fetchProductById } from "../../services/products/productsFetch";
+import Loader from "../Loader";
+import styles from "./ProductInterface.module.css";
+import ReviewList from "./ReviewList";
 
 export default function ProductInterface() {
   const { id } = useParams();
@@ -28,7 +28,7 @@ export default function ProductInterface() {
           <img
             className={styles.img}
             style={
-              product.category.slug === 'laptops' ? { maxHeight: '300px' } : {}
+              product.category.slug === "laptops" ? { maxHeight: "300px" } : {}
             }
             src={`../${product.imagePath}`}
             alt={product.category.name}
@@ -42,7 +42,7 @@ export default function ProductInterface() {
         </div>
       </div>
       <div>
-        {product.reviews.length ? (
+        {product.reviews?.length ? (
           <div>
             <h1>Відгуки:</h1>
             <div className={styles.reviews}>
