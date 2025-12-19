@@ -1,8 +1,15 @@
-import React from 'react';
-import styles from './CategoryCard.module.css';
-import { Link } from 'react-router-dom';
+import React from "react";
+import styles from "./CategoryCard.module.css";
+import { Link } from "react-router-dom";
+import { URL } from "../../services/api";
 
 export default function CategoryCard({ category }) {
+  const getImageUrl = (path) => {
+    if (!path) return "";
+    if (path.startsWith("http")) return path;
+    return `${URL}/${path}`;
+  };
+
   return (
     <Link className={styles.link} to={`/products?category=${category.slug}`}>
       <div
@@ -12,7 +19,7 @@ export default function CategoryCard({ category }) {
       >
         <img
           className={styles.categoryImg}
-          src={category.imagePath}
+          src={getImageUrl(category.imagePath)}
           alt={category.name}
         />
         <div className={styles.categoryTitle}>

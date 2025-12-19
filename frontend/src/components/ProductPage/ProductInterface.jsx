@@ -4,6 +4,7 @@ import { fetchProductById } from "../../services/products/productsFetch";
 import Loader from "../Loader";
 import styles from "./ProductInterface.module.css";
 import ReviewList from "./ReviewList";
+import { URL } from "../../services/api";
 
 export default function ProductInterface() {
   const { id } = useParams();
@@ -21,6 +22,12 @@ export default function ProductInterface() {
   if (error) return <div>Error: {error}</div>;
   if (loading) return <Loader />;
 
+  const getImageUrl = (path) => {
+    if (!path) return "";
+    if (path.startsWith("http")) return path;
+    return `${URL}/${path}`;
+  };
+
   return (
     <div className={styles.product}>
       <div className={styles.standard}>
@@ -30,7 +37,7 @@ export default function ProductInterface() {
             style={
               product.category.slug === "laptops" ? { maxHeight: "300px" } : {}
             }
-            src={`../${product.imagePath}`}
+            src={getImageUrl(product.imagePath)}
             alt={product.category.name}
           />
 
