@@ -23,7 +23,6 @@ import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
 import { AuthService } from './auth.service';
 import { ModeratorGuard } from 'src/common/decorators/guards/moderator.guard';
-const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
 @Controller('auth')
 export class AuthController {
@@ -61,12 +60,7 @@ export class AuthController {
 
   @Patch('/update-credentials')
   @UseGuards(AuthGuard())
-  @UseInterceptors(
-    FileInterceptor(
-      'file',
-      setStorageOptions('user-images', allowedExtensions),
-    ),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   updateCredentials(
     @GetUser() user: User,
     @Body() updateCredentialsDto: UpdateCredentialsDto,
