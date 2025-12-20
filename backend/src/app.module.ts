@@ -9,6 +9,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { PaymentModule } from './payment/payment.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { CloudinaryModule } from './cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { join } from 'path';
     ReviewsModule,
     CategoriesModule,
     PaymentModule,
+    CloudinaryModule,
     ConfigModule.forRoot({
       envFilePath: ['../.env'],
       validationSchema: configValidationSchema,
