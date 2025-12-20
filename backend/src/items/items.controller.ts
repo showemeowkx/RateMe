@@ -16,7 +16,6 @@ import { AddItemDto } from './dto/add-item.dto';
 import { User } from 'src/auth/user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { setStorageOptions } from 'src/common/file-upload';
 import { Item } from './item.entity';
 import { GetItemsFilterDto } from './dto/get-items-filter.dto';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
@@ -26,8 +25,6 @@ import { ItemsServiceInterface } from './items-service.interfase';
 import { SortItemsDto } from './dto/sort-items.dto';
 import { ValidationExceptionFilter } from 'src/common/validation-exception-filter';
 import { ModeratorGuard } from 'src/common/decorators/guards/moderator.guard';
-
-const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
 @Controller('items')
 export class ItemsController {
@@ -52,12 +49,7 @@ export class ItemsController {
   @Post()
   @UseGuards(AuthGuard())
   @UseFilters(ValidationExceptionFilter)
-  @UseInterceptors(
-    FileInterceptor(
-      'file',
-      setStorageOptions('item-images', allowedExtensions),
-    ),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   addItem(
     @Body() addItemDto: AddItemDto,
     @GetUser() user: User,

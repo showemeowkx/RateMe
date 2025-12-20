@@ -7,6 +7,7 @@ import { NestjsFormDataModule } from 'nestjs-form-data';
 import { CategoriesModule } from 'src/categories/categories.module';
 import { ItemsProxy } from './items.proxy';
 import { AuthModule } from 'src/auth/auth.module';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { AuthModule } from 'src/auth/auth.module';
     AuthModule,
     CategoriesModule,
     NestjsFormDataModule,
+    CloudinaryModule,
   ],
   controllers: [ItemsController],
   providers: [
