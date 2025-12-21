@@ -30,6 +30,7 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
       validationSchema: configValidationSchema,
     }),
     TypeOrmModule.forFeature([User]),
+    CloudinaryModule,
   ],
   controllers: [AuthController],
   providers: [
@@ -43,7 +44,6 @@ import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
     },
     JwtStrategy,
     ModeratorGuard,
-    CloudinaryModule,
   ],
   exports: [JwtStrategy, PassportModule, 'AUTH_SERVICE', ModeratorGuard],
 })
