@@ -2,9 +2,12 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
   Inject,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
   Query,
@@ -63,7 +66,15 @@ export class AuthController {
   updateCredentials(
     @GetUser() user: User,
     @Body() updateCredentialsDto: UpdateCredentialsDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
   ): Promise<{ accessToken: string }> {
     return this.authService.updateCredentials(user, updateCredentialsDto, file);
   }

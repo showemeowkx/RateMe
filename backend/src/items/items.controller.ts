@@ -2,9 +2,12 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
   Inject,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Post,
   Query,
   UploadedFile,
@@ -53,7 +56,15 @@ export class ItemsController {
   addItem(
     @Body() addItemDto: AddItemDto,
     @GetUser() user: User,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
   ): Promise<{ itemId: string }> {
     return this.itemsService.addItem(addItemDto, user, file);
   }
