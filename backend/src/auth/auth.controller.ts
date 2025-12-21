@@ -18,7 +18,6 @@ import { User } from './user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { setStorageOptions } from 'src/common/file-upload';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
 import { AuthService } from './auth.service';

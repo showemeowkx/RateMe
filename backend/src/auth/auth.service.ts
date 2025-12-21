@@ -16,7 +16,6 @@ import { AuthSignInCredDto } from './dto/auth-sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
-import * as fs from 'fs/promises';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
 import { AuthServiceInterface } from './auth-service.interface';
 import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
