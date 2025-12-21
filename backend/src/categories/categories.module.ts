@@ -5,9 +5,14 @@ import { Category } from './category.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NestjsFormDataModule } from 'nestjs-form-data';
 import { CategoriesProxy } from './categories.proxy';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Category]), NestjsFormDataModule],
+  imports: [
+    TypeOrmModule.forFeature([Category]),
+    NestjsFormDataModule,
+    CloudinaryModule,
+  ],
   controllers: [CategoriesController],
   providers: [
     CategoriesService,

@@ -2,9 +2,12 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
   Inject,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Post,
   Query,
   UploadedFile,
@@ -13,13 +16,10 @@ import {
 } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { setStorageOptions } from 'src/common/file-upload';
 import { Category } from './category.entity';
 import { GetCategoriesFilterDto } from './dto/get-categories-filter.dto';
 import { ModeratorGuard } from 'src/common/decorators/guards/moderator.guard';
 import { CategoriesServiceIInterface } from './categories-service.interface';
-
-const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
 @Controller('categories')
 export class CategoriesController {
@@ -37,15 +37,18 @@ export class CategoriesController {
 
   @Post()
   @UseGuards(ModeratorGuard)
-  @UseInterceptors(
-    FileInterceptor(
-      'file',
-      setStorageOptions('category-images', allowedExtensions),
-    ),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   createCategory(
     @Body() createCategoryDto: CreateCategoryDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
   ): Promise<void> {
     return this.categoriesService.createCategory(createCategoryDto, file);
   }

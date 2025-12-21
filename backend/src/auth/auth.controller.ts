@@ -2,9 +2,12 @@ import {
   Body,
   Controller,
   Delete,
+  FileTypeValidator,
   Get,
   Inject,
+  MaxFileSizeValidator,
   Param,
+  ParseFilePipe,
   Patch,
   Post,
   Query,
@@ -18,12 +21,10 @@ import { User } from './user.entity';
 import { AuthGuard } from '@nestjs/passport';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { setStorageOptions } from 'src/common/file-upload';
 import { GetUser } from 'src/common/decorators/get-user.decorator';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
 import { AuthService } from './auth.service';
 import { ModeratorGuard } from 'src/common/decorators/guards/moderator.guard';
-const allowedExtensions: string[] = ['.jpg', '.jpeg', '.png'];
 
 @Controller('auth')
 export class AuthController {
@@ -61,16 +62,19 @@ export class AuthController {
 
   @Patch('/update-credentials')
   @UseGuards(AuthGuard())
-  @UseInterceptors(
-    FileInterceptor(
-      'file',
-      setStorageOptions('user-images', allowedExtensions),
-    ),
-  )
+  @UseInterceptors(FileInterceptor('file'))
   updateCredentials(
     @GetUser() user: User,
     @Body() updateCredentialsDto: UpdateCredentialsDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile(
+      new ParseFilePipe({
+        validators: [
+          new MaxFileSizeValidator({ maxSize: 5 * 1024 * 1024 }),
+          new FileTypeValidator({ fileType: '.(png|jpeg|jpg)' }),
+        ],
+      }),
+    )
+    file: Express.Multer.File,
   ): Promise<{ accessToken: string }> {
     return this.authService.updateCredentials(user, updateCredentialsDto, file);
   }

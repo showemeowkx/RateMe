@@ -10,6 +10,7 @@ import { configValidationSchema } from 'src/config.schema';
 import { JwtStrategy } from './jwt.strategy';
 import { ModeratorGuard } from 'src/common/decorators/guards/moderator.guard';
 import { AuthProxy } from './auth.proxy';
+import { CloudinaryModule } from 'src/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { AuthProxy } from './auth.proxy';
       validationSchema: configValidationSchema,
     }),
     TypeOrmModule.forFeature([User]),
+    CloudinaryModule,
   ],
   controllers: [AuthController],
   providers: [

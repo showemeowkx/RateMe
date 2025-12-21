@@ -16,10 +16,12 @@ import { AuthSignInCredDto } from './dto/auth-sign-in.dto';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './jwt-payload.interface';
 import { GetUsersFilterDto } from './dto/get-users-filter.dto';
-import * as fs from 'fs/promises';
 import { UpdateCredentialsDto } from './dto/update-credentials.dto';
 import { AuthServiceInterface } from './auth-service.interface';
-import { getPrimaryPath, getRealPath } from 'src/common/file-upload';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
+
+const DEFAULT_USER_IMAGE =
+  'https://res.cloudinary.com/dgsoaci96/image/upload/v1766264530/user_default_b2ok2s.jpg';
 
 @Injectable()
 export class AuthService implements AuthServiceInterface {
@@ -28,6 +30,7 @@ export class AuthService implements AuthServiceInterface {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private jwtService: JwtService,
+    private cloudinaryService: CloudinaryService,
   ) {}
 
   async getUsers(filterDto: GetUsersFilterDto): Promise<User[]> {
@@ -125,7 +128,7 @@ export class AuthService implements AuthServiceInterface {
     const hashedPassword = await bcrypt.hash(password, salt);
 
     const user = this.userRepository.create({
-      imagePath: 'uploads/defaults/user_default.jpg',
+      imagePath: DEFAULT_USER_IMAGE,
       name: `${name.trim()} ${surname.trim()}`,
       username,
       email,
@@ -181,28 +184,20 @@ export class AuthService implements AuthServiceInterface {
   }
 
   async updatePfp(user: User, file: Express.Multer.File): Promise<void> {
-    const oldImagePath = user.imagePath;
-    const newImagePath = file?.path;
-
-    if (!newImagePath) {
-      this.logger.error(
-        `[FILE ERROR] Failed to update a profile picture {username: ${user.username}}`,
-      );
+    if (!file) {
+      this.logger.error(`[FILE ERROR] Failed to update pfp - No file`);
       throw new InternalServerErrorException();
     }
 
     try {
+      const result = await this.cloudinaryService.uploadFile(file);
+      const newImageUrl = result.secure_url as string;
       await this.userRepository.update(user.id, {
-        imagePath: getPrimaryPath(newImagePath),
+        imagePath: newImageUrl,
       });
-      if (oldImagePath !== 'uploads/defaults/user_default.jpg') {
-        const realOldImagePath = getRealPath(oldImagePath);
-        await fs.unlink(realOldImagePath);
-      }
     } catch (error) {
-      await fs.unlink(newImagePath);
       this.logger.error(
-        `[INTERNAL] Failed to update a profile picture... {username: ${user.username}}`,
+        `[INTERNAL] Failed to update profile picture`,
         error.stack,
       );
       throw new InternalServerErrorException();
@@ -302,22 +297,7 @@ export class AuthService implements AuthServiceInterface {
     const user =
       typeof toDelete === 'string' ? await this.getUserById(userId) : toDelete;
     try {
-      const imagePath = getRealPath(user.imagePath);
-      const itemsImagePaths = user['items'].map((item) =>
-        getRealPath(item.imagePath),
-      );
-      await this.userRepository
-        .remove(user)
-        .then(async () => {
-          if (user.imagePath !== 'uploads/defaults/user_default.jpg') {
-            await fs.unlink(imagePath);
-          }
-        })
-        .then(async () => {
-          for (const imagePath of itemsImagePaths) {
-            await fs.unlink(imagePath);
-          }
-        });
+      await this.userRepository.remove(user);
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to delete a user {userId: ${userId}}`,

@@ -9,9 +9,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Category } from './category.entity';
 import { Repository } from 'typeorm';
 import { CreateCategoryDto } from './dto/create-category.dto';
-import * as fs from 'fs/promises';
 import { GetCategoriesFilterDto } from './dto/get-categories-filter.dto';
-import { getPrimaryPath, getRealPath } from 'src/common/file-upload';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class CategoriesService implements CategoriesService {
@@ -19,6 +18,7 @@ export class CategoriesService implements CategoriesService {
   constructor(
     @InjectRepository(Category)
     private categoriesRepository: Repository<Category>,
+    private cloudinaryService: CloudinaryService,
   ) {}
 
   async getCategories(filterDto: GetCategoriesFilterDto): Promise<Category[]> {
@@ -52,12 +52,18 @@ export class CategoriesService implements CategoriesService {
   ): Promise<void> {
     const { name, slug, color } = createCategoryDto;
 
-    const imagePath = file?.path;
+    let imageUrl = '';
 
-    if (!imagePath) {
-      this.logger.error(
-        `[FILE ERROR] Failed to create a category {slug: ${slug}}`,
-      );
+    if (file) {
+      try {
+        const result = await this.cloudinaryService.uploadFile(file);
+        imageUrl = result.secure_url as string;
+      } catch (error) {
+        this.logger.error('[INTERNAL] Cloudinary upload failed', error.stack);
+        throw new InternalServerErrorException();
+      }
+    } else {
+      this.logger.error('[INTERNAL] File is required');
       throw new InternalServerErrorException();
     }
 
@@ -65,13 +71,12 @@ export class CategoriesService implements CategoriesService {
       name,
       slug,
       color,
-      imagePath: getPrimaryPath(imagePath),
+      imagePath: imageUrl,
     });
 
     try {
       await this.categoriesRepository.save(category);
     } catch (error) {
-      await fs.unlink(imagePath);
       if (error.code === '23505') {
         this.logger.error(
           `[ALREADY EXISTS] Failed to create a category {slug: ${slug}}`,
@@ -105,19 +110,7 @@ export class CategoriesService implements CategoriesService {
     }
 
     try {
-      const imagePath = getRealPath(category.imagePath);
-      const categoryItems = category.items;
-      const itemsImagePaths = categoryItems.map((item) =>
-        getRealPath(item.imagePath),
-      );
-      await this.categoriesRepository.remove(category).then(
-        async () =>
-          await fs.unlink(imagePath).then(async () => {
-            for (const imagePath of itemsImagePaths) {
-              await fs.unlink(imagePath);
-            }
-          }),
-      );
+      await this.categoriesRepository.remove(category);
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to delete a category {slug: ${slug}}`,

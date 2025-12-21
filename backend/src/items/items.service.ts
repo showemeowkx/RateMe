@@ -12,7 +12,6 @@ import { Repository } from 'typeorm';
 import { Item } from './item.entity';
 import { AddItemDto } from './dto/add-item.dto';
 import { User } from 'src/auth/user.entity';
-import * as fs from 'fs/promises';
 import { GetItemsFilterDto } from './dto/get-items-filter.dto';
 import { PaginationDto } from 'src/common/pagination/dto/pagination.dto';
 import { PaginationQueryDto } from 'src/common/pagination/dto/pagination-query.dto';
@@ -20,8 +19,8 @@ import { paginate } from 'src/common/pagination/pagination';
 import { ItemsServiceInterface } from './items-service.interfase';
 import { CategoriesServiceIInterface } from 'src/categories/categories-service.interface';
 import { SortItemsDto } from './dto/sort-items.dto';
-import { getPrimaryPath, getRealPath } from 'src/common/file-upload';
 import { Review } from 'src/reviews/review.entity';
+import { CloudinaryService } from 'src/cloudinary/cloudinary.service';
 
 @Injectable()
 export class ItemsService implements ItemsServiceInterface {
@@ -30,6 +29,7 @@ export class ItemsService implements ItemsServiceInterface {
     @InjectRepository(Item) private itemsRepository: Repository<Item>,
     @Inject('CATEGORIES_SERVICE')
     private categoriesService: CategoriesServiceIInterface,
+    private cloudinaryService: CloudinaryService,
   ) {}
 
   async getItems(
@@ -151,12 +151,18 @@ export class ItemsService implements ItemsServiceInterface {
   ): Promise<{ itemId: string }> {
     const { categorySlug, name, description } = addItemDto;
 
-    const imagePath = file?.path;
+    let imageUrl = '';
 
-    if (!imagePath) {
-      this.logger.error(
-        `[FILE ERROR] Failed to create a category {slug: ${categorySlug}}`,
-      );
+    if (file) {
+      try {
+        const result = await this.cloudinaryService.uploadFile(file);
+        imageUrl = result.secure_url as string;
+      } catch (error) {
+        this.logger.error('[INTERNAL] Cloudinary upload failed', error.stack);
+        throw new InternalServerErrorException();
+      }
+    } else {
+      this.logger.error('[INTERNAL] File is required');
       throw new InternalServerErrorException();
     }
 
@@ -165,7 +171,6 @@ export class ItemsService implements ItemsServiceInterface {
     });
 
     if (category.length < 1) {
-      await fs.unlink(imagePath);
       this.logger.error(`[WRONG INPUT] Failed to add an item {name: ${name}}`);
       throw new NotFoundException(
         `A category with slug '${categorySlug}' doesn't exist`,
@@ -174,7 +179,7 @@ export class ItemsService implements ItemsServiceInterface {
 
     const item = this.itemsRepository.create({
       creator: user,
-      imagePath: getPrimaryPath(imagePath),
+      imagePath: imageUrl,
       category: category[0],
       name,
       description,
@@ -187,7 +192,6 @@ export class ItemsService implements ItemsServiceInterface {
       await this.itemsRepository.save(item);
       return { itemId: item.id };
     } catch (error) {
-      await fs.unlink(imagePath);
       if (error.code === '23505') {
         this.logger.error(
           `[ALREADY EXISTS] Failed to add an item {name: ${name}}`,
@@ -229,8 +233,7 @@ export class ItemsService implements ItemsServiceInterface {
   async deleteItem(itemId: string): Promise<void> {
     const item = await this.getItemById(itemId);
     try {
-      const imagePath = getRealPath(item.imagePath);
-      await this.itemsRepository.remove(item).then(() => fs.unlink(imagePath));
+      await this.itemsRepository.remove(item);
     } catch (error) {
       this.logger.error(
         `[INTERNAL] Failed to delete an item {itemId: ${item.id}`,
